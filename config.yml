@@ -1,0 +1,10 @@
+Appy.Configuration:
+  Type: Package
+Appy.Configuration.WinRegistry:
+  Type: Package
+Appy.Infrastructure.1Password:
+  Type: Package
+Appy.Configuration.1Password:
+  Type: Package
+Appy.Tool.1Password:
+  Type: Package
