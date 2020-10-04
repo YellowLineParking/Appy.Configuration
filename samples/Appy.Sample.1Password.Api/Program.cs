@@ -27,7 +27,7 @@ namespace Appy.Sample.OnePassword.Api
                         .AddEnvironmentVariables();
 
                     if (hostingContext.HostingEnvironment.IsDevelopment())
-                    {   
+                    {
                         // Options to load 1Password settings
 
                         // 1.1  Load 1Password settings for the environment with the values manually setted for this session:

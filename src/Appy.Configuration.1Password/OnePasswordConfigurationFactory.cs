@@ -4,15 +4,23 @@ using Appy.Infrastructure.OnePassword.Tooling;
 
 namespace Appy.Configuration.OnePassword
 {
-    internal class OnePasswordConfigurationFactory
+    internal static class OnePasswordConfigurationFactory
     {
-        public static IConfigurationJsonSerializer CreateDefaultSerializer() =>
-            new NewtonsoftConfigurationJsonSerializer();
+        public static IAppyJsonSerializer CreateDefaultSerializer() =>
+            new NewtonsoftAppyJsonSerializer();
 
         public static IProcessRunner CreateDefaultProcessRunner() =>
             new DefaultProcessRunner();
 
-        public static IOnePasswordTool CreateDefaultOnePasswordTool(IConfigurationJsonSerializer jsonSerializer, IProcessRunner processRunner) =>
-            new OnePasswordTool(jsonSerializer, processRunner);
+        public static IOnePasswordTool CreateDefaultOnePasswordTool(
+            IAppyJsonSerializer jsonSerializer,
+            IProcessRunner processRunner,
+            IOnePasswordUserEnvironmentAccessor userEnvironmentAccessor) =>
+            new OnePasswordTool(
+                jsonSerializer,
+                processRunner);
+
+        public static IOnePasswordUserEnvironmentAccessor CreateDefaultUserEnvironmentAccessor() =>
+            new OnePasswordUserEnvironmentAccessor();
     }
 }

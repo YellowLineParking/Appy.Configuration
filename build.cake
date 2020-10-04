@@ -1,13 +1,14 @@
 #addin nuget:?package=Cake.Yaml&version=3.1.1
 #addin nuget:?package=YamlDotNet&version=8.1.2
 
-#load "./build/functions.cake"
+#load "./functions.cake"
 
 var configFilePath = "config.yml";
 var taskConfigManager = new ProjectTaskConfigurationManager();
 var projectConfigs = new ProjectConfigLoader().Load(Context, configFilePath).Projects;
 var basePath = "./src";
-var target = Argument("target", "Default");
+var artifactsPath = Context.Directory("./.artifacts");
+var target = Argument("target", "Test");
 var configuration = Argument("configuration", "Release");
 
 ////////////////////////////////////////////////////////////////
@@ -39,7 +40,8 @@ Task("Build")
     {
         if (!taskConfigManager.CanBuild(projectConfig)) continue;
 
-        DotNetCoreBuild($"{basePath}/{projectConfig.Name}/{projectConfig.Name}.csproj", new DotNetCoreBuildSettings {
+        var projectPath = BuildProjectPath(basePath, projectConfig);
+        DotNetCoreBuild(projectPath, new DotNetCoreBuildSettings {
             Configuration = configuration,
             NoRestore = true,
             NoIncremental = context.HasArgument("rebuild"),
@@ -53,11 +55,21 @@ Task("Test")
     .IsDependentOn("Build")
     .Does(context =>
 {
-    // DotNetCoreTest("./src/Appy.Configuration.Tests/Appy.Configuration.Tests.csproj", new DotNetCoreTestSettings {
-    //     Configuration = configuration,
-    //     NoRestore = true,
-    //     NoBuild = true,
-    // });
+    foreach(var projectConfig in projectConfigs)
+    {
+        if (!taskConfigManager.CanTest(projectConfig)) continue;
+
+        var projectPath = BuildProjectPath(basePath, projectConfig);
+        DotNetCoreTest(projectPath, new DotNetCoreTestSettings {
+            Configuration = configuration,
+            NoRestore = true,
+            NoBuild = true,
+            TestAdapterPath = ".",
+            Logger = $"xunit;LogFilePath={MakeAbsolute(artifactsPath).FullPath}/xunit-{projectConfig.Name}.xml",
+            Verbosity = DotNetCoreVerbosity.Quiet
+        });
+    }
+
 });
 
 Task("Package")
@@ -70,11 +82,12 @@ Task("Package")
     {
         if (!taskConfigManager.CanPack(projectConfig)) continue;
 
-        context.DotNetCorePack($"{basePath}/{projectConfig.Name}/{projectConfig.Name}.csproj", new DotNetCorePackSettings {
+        var projectPath = BuildProjectPath(basePath, projectConfig);
+        context.DotNetCorePack(projectPath, new DotNetCorePackSettings {
             Configuration = configuration,
             NoRestore = true,
             NoBuild = true,
-            OutputDirectory = "./.artifacts",
+            OutputDirectory = artifactsPath,
             MSBuildSettings = new DotNetCoreMSBuildSettings()
                 .TreatAllWarningsAs(MSBuildTreatAllWarningsAs.Error)
         });
@@ -91,7 +104,6 @@ Task("Publish-GitHub")
         throw new CakeException("No GitHub API key was provided.");
     }
 
-    // Publish to GitHub Packages
     var exitCode = 0;
     foreach(var file in context.GetFiles("./.artifacts/*.nupkg"))
     {
@@ -123,7 +135,6 @@ Task("Publish-NuGet")
         throw new CakeException("No NuGet API key was provided.");
     }
 
-    // Publish to GitHub Packages
     foreach(var file in context.GetFiles("./.artifacts/*.nupkg"))
     {
         context.Information("Publishing {0}...", file.GetFilename().FullPath);

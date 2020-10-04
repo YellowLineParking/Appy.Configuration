@@ -207,12 +207,14 @@ Please, follow the official ['Getting started docs from 1Password'](https://supp
 
 #### First Time access
 
-Execute the next command to signin to 1Password using the CLI. 
+Execute the next command to signin to 1Password using the CLI.
 ```
-op signin yourorg.1password.com user@yourorg.com 
+op signin <yourorg.1password.com> <email-address> <secret_key>
 ```
 
-It will ask for your secret key and your password. You can get the first one from your 1Password Desktop or Mobile App.
+You can get all these data from your 1Password Desktop or Mobile App account details.
+
+Then, it will ask for your password.
 
 #### Later time access
 
@@ -230,15 +232,29 @@ It is necessary to know that 1Password sessions with automatically expire after 
 
 ![Secure Note Example](resources/screenshots/op-note-appsettings.png)
 
-TODO 
+TODO
 
-### 1Password Appy Tool
+### 1Password dotnet Tool
 
+The Appy 1Password Tool is a dotnet tool that works as a wrapper around the official (1Password command-line tool)[https://1password.com/downloads/command-line/]
+to start a 1Password session, and following some basic conventions it will help you to run and debug locally any dotnet project using the preconfigured AppSettings for the project saved on 1Password.
+
+The tool allows you to create a session and later set the following environment variables to be loaded by your project through the 1Password Configuration Provider extensions:
+
+Environment variables conventions:
+```
+- appy_organization
+- appy_vault
+- appy_env
+- appy_session_token
+```
+
+## Install the tool globally
 ```
 dotnet tool install -g appy-op
 ```
 
-TODO
+TODO 
 
 ## Contribute
 It would be awesome if you would like to contribute code or help with bugs. Just follow the guidelines [CONTRIBUTING](https://github.com/YellowLineParking/Appy.Configuration/blob/master/CONTRIBUTING.md).

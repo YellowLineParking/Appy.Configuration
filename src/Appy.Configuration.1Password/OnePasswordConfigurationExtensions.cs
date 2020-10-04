@@ -1,6 +1,5 @@
 using System;
 using Microsoft.Extensions.Configuration;
-using static Appy.Configuration.Common.EnvironmentUtils;
 using static Appy.Infrastructure.OnePassword.Tooling.KnownUserEnvVars;
 
 namespace Appy.Configuration.OnePassword
@@ -36,7 +35,8 @@ namespace Appy.Configuration.OnePassword
         {
             var jsonSerializer = OnePasswordConfigurationFactory.CreateDefaultSerializer();
             var processRunner = OnePasswordConfigurationFactory.CreateDefaultProcessRunner();
-            var tool = OnePasswordConfigurationFactory.CreateDefaultOnePasswordTool(jsonSerializer, processRunner);
+            var userEnvironmentAccessor = OnePasswordConfigurationFactory.CreateDefaultUserEnvironmentAccessor();
+            var tool = OnePasswordConfigurationFactory.CreateDefaultOnePasswordTool(jsonSerializer, processRunner, userEnvironmentAccessor);
 
             var source = new OnePasswordConfigurationSource(
                 tool,
@@ -53,7 +53,7 @@ namespace Appy.Configuration.OnePassword
 
         /// <summary>
         /// Adds 1Password configuration provider for <paramref name="appName"/> to <paramref name="builder"/>.
-        /// A series of conventions are followed in coordination with the AppyWay 1Password console tool:
+        /// A series of conventions are followed in coordination with the Appy 1Password console tool:
         /// - AppName: Identifies the application where to load the settings. A secure note is expected to exist
         /// in 1Password with a name of the form "appName.AppSettings". Inside this there should be a section
         /// for each environment with the settings. Each setting should be like eg: "Database:ConnectionString".
@@ -71,19 +71,21 @@ namespace Appy.Configuration.OnePassword
             string appName,
             Action<OnePasswordConfigurationSource>? configureSource = null)
         {
-            var organization = GetUserEnvironmentVariable(OnePasswordOrganization);
+            var envAccessor = OnePasswordConfigurationFactory.CreateDefaultUserEnvironmentAccessor();
+
+            var organization = envAccessor.GetOrganization();
             if (string.IsNullOrWhiteSpace(organization))
                 throw new ArgumentException($"1Password Organization should be in the user environment variables like '${OnePasswordOrganization}'");
 
-            var vault = GetUserEnvironmentVariable(OnePasswordVault);
+            var vault = envAccessor.GetVault();
             if (string.IsNullOrWhiteSpace(vault))
                 throw new ArgumentException($"1Password Vault should be in the user environment variables like '${OnePasswordVault}'");
 
-            var environment = GetUserEnvironmentVariable(OnePasswordEnvironment);
+            var environment = envAccessor.GetExecutionEnvironment();
             if (string.IsNullOrWhiteSpace(environment))
                 throw new ArgumentException($"1Password Environment should be in the user environment variables like '${OnePasswordEnvironment}'");
 
-            var sessionToken = GetUserEnvironmentVariable(OnePasswordSessionToken);
+            var sessionToken = envAccessor.GetSessionToken();
             if (string.IsNullOrWhiteSpace(sessionToken))
                 throw new ArgumentException($"1Password Session Token should be in user environment variables like '${OnePasswordSessionToken}'");
 

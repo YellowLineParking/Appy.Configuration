@@ -8,3 +8,5 @@ Appy.Configuration.1Password:
   Type: Package
 Appy.Tool.1Password:
   Type: Package
+Appy.Configuration.Tests:
+  Type: XUnit

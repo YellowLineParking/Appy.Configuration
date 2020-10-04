@@ -49,4 +49,14 @@
     <McMasterExtensionsCommandLineUtilsPackageVersion>3.0.0</McMasterExtensionsCommandLineUtilsPackageVersion>
   </PropertyGroup>
 
+  <PropertyGroup Label="Test Package Versions">
+    <MicrosoftNETTestSdkPackageVersion>16.7.0</MicrosoftNETTestSdkPackageVersion>
+    <FluentAssertionsPackageVersion>5.10.3</FluentAssertionsPackageVersion>
+    <MoqPackageVersion>4.14.6</MoqPackageVersion>
+    <XunitPackageVersion>2.4.1</XunitPackageVersion>
+    <XunitRunnerVisualStudioPackageVersion>2.4.3</XunitRunnerVisualStudioPackageVersion>
+    <CoverletCollectorPackageVersion>1.3.0</CoverletCollectorPackageVersion>
+    <XunitXmlTestLoggerPackageVersion>2.1.26</XunitXmlTestLoggerPackageVersion>
+  </PropertyGroup>
+
 </Project>

@@ -15,7 +15,7 @@ namespace Appy.Configuration.OnePassword
         readonly OnePasswordConfigurationSource _source;
 
         /// <summary>
-        /// Creates configuration provider for 1Password.
+        /// Creates a configuration provider for 1Password.
         /// </summary>
         /// <param name="source">The source settings.</param>
         public OnePasswordConfigurationProvider(OnePasswordConfigurationSource source)
@@ -27,7 +27,7 @@ namespace Appy.Configuration.OnePassword
 
         async Task LoadAsync()
         {
-            var query = new OnePasswordGetNoteQuery
+            var query = new GetOnePasswordNoteQuery
             {
                 Organisation = _source.Organization,
                 Item = _source.AppSettingsName,
@@ -43,18 +43,18 @@ namespace Appy.Configuration.OnePassword
             var sectionFields = result.EnvironmentSection?.Fields;
             if (sectionFields == null)
             {
-                throw new OnePasswordToolException("1Password environment section settings cannot be null");
+                throw new OnePasswordToolException($"1Password {query.Environment} environment section settings cannot be null");
             }
 
             foreach (var sectionField in sectionFields)
             {
                 if (string.IsNullOrWhiteSpace(sectionField.Name))
                 {
-                    throw new OnePasswordToolException("1Password Section fields name cannot be empty");
+                    throw new OnePasswordToolException($"1Password {query.Environment} environment section fields name cannot be empty");
                 }
                 if (string.IsNullOrWhiteSpace(sectionField.Value))
                 {
-                    throw new OnePasswordToolException($"1Password Section field '{sectionField.Name} value cannot be empty");
+                    throw new OnePasswordToolException($"1Password {query.Environment} environment section field '{sectionField.Name}' value cannot be empty");
                 }
 
                 data[sectionField.Name!] = sectionField.Value!;

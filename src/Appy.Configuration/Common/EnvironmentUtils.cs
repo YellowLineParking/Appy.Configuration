@@ -9,7 +9,7 @@ namespace Appy.Configuration.Common
                 ? Environment.GetEnvironmentVariable(environmentVariable, EnvironmentVariableTarget.User)
                 : environmentVariable)!;
 
-        public static void SetUserEnvironmentVariable(string environmentVariable, string value) =>
+        public static void SetUserEnvironmentVariable(string environmentVariable, string? value) =>
             Environment.SetEnvironmentVariable(environmentVariable, value, EnvironmentVariableTarget.User);
     }
 }

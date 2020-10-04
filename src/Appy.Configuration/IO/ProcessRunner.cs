@@ -16,6 +16,7 @@ namespace Appy.Configuration.IO
             {
                 if (settings.EnvironmentVariables?.Count > 0)
                 {
+                   //  options.StartInfo(p => p.RedirectStandardInput = true);
                     options.EnvironmentVariables(settings.EnvironmentVariables);
                 }
             });
