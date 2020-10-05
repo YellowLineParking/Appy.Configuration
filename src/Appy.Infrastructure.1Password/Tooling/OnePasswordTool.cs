@@ -1,33 +1,37 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Appy.Configuration.IO;
+using Appy.Configuration.Logging;
 using Appy.Configuration.Serializers;
 using Appy.Infrastructure.OnePassword.Commands;
 using Appy.Infrastructure.OnePassword.Model;
 using Appy.Infrastructure.OnePassword.Queries;
-using Appy.Infrastructure.OnePassword.Validation;
 
 namespace Appy.Infrastructure.OnePassword.Tooling
 {
     ///<inheritdoc cref="IOnePasswordTool"/>
     public class OnePasswordTool : IOnePasswordTool
     {
+        readonly ILogger _logger;
         readonly IAppyJsonSerializer _jsonSerializer;
         readonly IProcessRunner _processRunner;
         const string ToolPath = "op";
 
         public OnePasswordTool(
+            ILogger logger,
             IAppyJsonSerializer jsonSerializer,
             IProcessRunner processRunner)
         {
+            _logger = logger;
             _jsonSerializer = jsonSerializer;
             _processRunner = processRunner;
         }
 
-        static async Task<ProcessResult> GetItem(IProcessRunner processRunner, string organization, string vault, string item, string sessionToken)
+        static Task<ProcessResult> GetItem(IProcessRunner processRunner, string organization, string vault, string item, string sessionToken)
         {
             var arguments = new ProcessArgumentBuilder();
             arguments.Append("get");
@@ -46,9 +50,43 @@ namespace Appy.Infrastructure.OnePassword.Tooling
 
             processSettings.EnvironmentVariables.Add(sessionEnvName, sessionToken);
 
-            var processResult = await processRunner.Run(ToolPath, processSettings);
+            return processRunner.Run(ToolPath, processSettings);
+        }
 
-            return processResult;
+        static Task<ProcessResult> Signin(IProcessRunner processRunner, ILogger logger, SignInOnePasswordCommand command)
+        {
+            var arguments = new ProcessArgumentBuilder();
+            arguments.Append("signin");
+            arguments.Append($"https://{command.Organization}.1password.com");
+
+            if (command.IsFirstSignIn)
+            {
+                arguments.Append(command.Email!);
+                arguments.Append(command.SecretKey!);
+            }
+
+            arguments.Append("--raw");
+
+            static async Task LogLines(ILogger logger, TextReader sr)
+            {
+                while (true)
+                {
+                    var line = await sr.ReadLineAsync(new StringBuilder());
+                    logger.LogInformation(line.Result);
+                    if (!line.HasMore) return;
+                }
+            }
+
+            var processSettings = new ProcessSettings
+            {
+                Arguments = arguments,
+                EnvironmentVariables = new Dictionary<string, string>(),
+                RedirectStandardInput = false,
+                CreateNoWindow = false,
+                StandardErrorReader = sr => LogLines(logger, sr)
+            };
+
+            return processRunner.Run(ToolPath, processSettings);
         }
 
         ///<inheritdoc cref="IOnePasswordTool"/>
@@ -75,7 +113,7 @@ namespace Appy.Infrastructure.OnePassword.Tooling
             }
             catch (Exception ex)
             {
-                throw new OnePasswordToolException("1Password Tool failed deserialization", innerException: ex);
+                throw new OnePasswordToolException("1Password Tool failed deserialization", ex);
             }
 
             if (environmentSection == null || environmentSection.Fields?.Count == 0)
@@ -91,69 +129,25 @@ namespace Appy.Infrastructure.OnePassword.Tooling
             return queryResult;
         }
 
-        static ValidationResult Validate(SignInOnePasswordCommand command)
-        {
-            var result = new ValidationResult();
-            if (string.IsNullOrWhiteSpace(command.Organization))
-                return result.WithError(nameof(command.Organization).ToLower(), "1Password organization must be specified");
-
-            if (!command.IsFirstSignIn)
-                return result;
-
-            if (string.IsNullOrWhiteSpace(command.Email))
-                return result.WithError(nameof(command.Email).ToLower(), "1Password email must be specified");
-
-            if (string.IsNullOrWhiteSpace(command.SecretKey))
-                return result.WithError(nameof(command.Email).ToLower(), "1Password secret key must be specified");
-
-            return result;
-        }
-
-        static async Task<ProcessResult> Signin(IProcessRunner processRunner, SignInOnePasswordCommand command)
-        {
-            var arguments = new ProcessArgumentBuilder();
-            arguments.Append("signin");
-            arguments.Append($"https://{command.Organization}.1password.com");
-
-            if (command.IsFirstSignIn)
-            {
-                arguments.Append(command.Email);
-                arguments.Append(command.SecretKey);
-            }
-
-            arguments.Append("--raw");
-
-            var processSettings = new ProcessSettings
-            {
-                Arguments = arguments,
-                EnvironmentVariables = new Dictionary<string, string>()
-            };
-
-            var processResult = await processRunner.Run(ToolPath, processSettings);
-
-            return processResult;
-        }
-
+        ///<inheritdoc cref="IOnePasswordTool"/>
         public async Task<SigninOnePasswordResult> Execute(SignInOnePasswordCommand command, CancellationToken cancellationToken = default)
         {
-            var validationResult = Validate(command);
+            var validationResult = command.Validate();
             if (!validationResult.IsValid)
             {
                 return SigninOnePasswordResult.Create(string.Empty);
             }
 
-            var processResult = await Signin(
-                processRunner: _processRunner,
-                command: command);
+            var processResult = await Signin(_processRunner, _logger, command);
 
             if (!processResult.Success)
             {
                 throw new OnePasswordToolException($"1Password internal CLI failed with exit code {processResult.ExitCode}: {processResult.StandardError}");
             }
 
-            var commandResult = SigninOnePasswordResult.Create(processResult.StandardOutput);
+            var sessionToken = processResult.StandardOutput.TrimEnd('\n');
 
-            return commandResult;
+            return SigninOnePasswordResult.Create(sessionToken);
         }
     }
 }

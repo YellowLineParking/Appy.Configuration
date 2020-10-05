@@ -1,4 +1,5 @@
 using System;
+using Appy.Configuration.Logging;
 using static System.Console;
 
 namespace Appy.Tool.OnePassword.Logging
@@ -18,7 +19,7 @@ namespace Appy.Tool.OnePassword.Logging
 
         public void LogWarning(string message) => Log(LogLevel.Quiet, message, ConsoleColor.Yellow);
 
-        private void Log(LogLevel level, string message, ConsoleColor color)
+        void Log(LogLevel level, string message, ConsoleColor color)
         {
             if (level < Level) return;
 

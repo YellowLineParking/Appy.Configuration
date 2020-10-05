@@ -1,6 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Medallion.Shell;
+using Medallion.Shell.Streams;
 
 namespace Appy.Configuration.IO
 {
@@ -12,16 +17,33 @@ namespace Appy.Configuration.IO
             if (settings == null) throw new ArgumentNullException(nameof(settings));
             if (settings.Arguments == null) throw new ArgumentNullException(nameof(settings.Arguments));
 
+            var tasks = new List<Task>();
+
             var command = Command.Run(toolPath, settings.Arguments, options =>
             {
                 if (settings.EnvironmentVariables?.Count > 0)
                 {
-                   //  options.StartInfo(p => p.RedirectStandardInput = true);
                     options.EnvironmentVariables(settings.EnvironmentVariables);
                 }
+
+                options.StartInfo(pinfo =>
+                {
+                    pinfo.RedirectStandardInput = settings.RedirectStandardInput;
+                    pinfo.CreateNoWindow = settings.CreateNoWindow;
+                    pinfo.UseShellExecute = settings.UseShellExecute;
+                });
             });
 
-            var commandResult = await command.Task;
+            if (settings.StandardErrorReader != null)
+            {
+                tasks.Add(settings.StandardErrorReader.Invoke(command.StandardError));
+            }
+
+            tasks.Add(command.Task);
+
+            await Task.WhenAll(tasks.ToArray());
+
+            var commandResult = await (Task<CommandResult>)tasks.Last();
 
             return ProcessResult.Create(
                 standardOutput: commandResult.StandardOutput,

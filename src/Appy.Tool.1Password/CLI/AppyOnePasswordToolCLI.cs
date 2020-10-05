@@ -1,31 +1,36 @@
 using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Appy.Configuration.Logging;
 using Appy.Infrastructure.OnePassword.Commands;
 using Appy.Infrastructure.OnePassword.Tooling;
 using Appy.Tool.OnePassword.Logging;
 using McMaster.Extensions.CommandLineUtils;
+using Spectre.Console;
 
 namespace Appy.Tool.OnePassword.CLI
 {
     internal class AppyOnePasswordToolCLI : IAppyOnePasswordToolCLI
     {
-        private readonly ILogger _logger;
-        private readonly IOnePasswordUserEnvironmentAccessor _environmentAccessor;
-        private readonly IOnePasswordTool _onePasswordTool;
+        readonly ILogger _logger;
+        readonly IConsoleVisualzer _consoleVisualizer;
+        readonly IOnePasswordUserEnvironmentAccessor _environmentAccessor;
+        readonly IOnePasswordTool _onePasswordTool;
         static string GetAssemblyVersion() => typeof(AppyOnePasswordToolCLI).Assembly.GetName().Version.ToString();
         public AppyOnePasswordToolCLI(
             ILogger logger,
+            IConsoleVisualzer consoleVisualizer,
             IOnePasswordUserEnvironmentAccessor environmentAccessor,
             IOnePasswordTool onePasswordTool
         )
         {
             _logger = logger;
+            _consoleVisualizer = consoleVisualizer;
             _environmentAccessor = environmentAccessor;
             _onePasswordTool = onePasswordTool;
         }
-
+       
         SignInOnePasswordCommand BuildSignInCommand(CommandLineApplication app, CommandOption option)
         {
             if (!option.HasValue())
@@ -33,22 +38,21 @@ namespace Appy.Tool.OnePassword.CLI
                 throw new CommandParsingException(app, "Signin option must be specified.");
             }
 
-            var values = (string.IsNullOrWhiteSpace(option.Value())
-                ? Enumerable.Empty<string>()
-                : option.Value().Split(' ').Select(v => v.Trim('\"', ' '))).ToList();
+            var parameters = option.Value()!.SplitBySpaceAndTrimSpaces();
 
-            if (values.Count > 0 && values.Count != 3)
+            var hasValidParameters = parameters.Count == 0 || parameters.Count == 3;
+            if (!hasValidParameters)
             {
                 throw new CommandParsingException(app, "Signin values must be specified: <organization> <email_address> <secret_key>.");
             }
 
-            if (values.Count > 0)
+            if (parameters.Count > 0)
             {
                 return new SignInOnePasswordCommand
                 {
-                    Organization = values.ElementAt(0),
-                    Email = values.ElementAt(1),
-                    SecretKey = values.ElementAt(2),
+                    Organization = parameters.ElementAt(0),
+                    Email = parameters.ElementAt(1),
+                    SecretKey = parameters.ElementAt(2),
                     IsFirstSignIn = true
                 };
             }
@@ -69,30 +73,7 @@ namespace Appy.Tool.OnePassword.CLI
 
         public async Task<int> ExecuteAsync(params string[] args)
         {
-            var argsFixed = new List<string>();
-            var argValues = new List<string>();
-            foreach (var arg in args)
-            {
-                if (!arg.StartsWith('-'))
-                {
-                    argValues.Add(arg);
-                    continue;
-                }
-
-                if (argValues.Count > 0)
-                {
-                    argsFixed.Add($"\"{string.Join(" ", argValues)}\"");
-                    argValues.Clear();
-                }
-
-                argsFixed.Add(arg);
-            }
-
-            if (argValues.Count > 0)
-            {
-                argsFixed.Add($"\"{string.Join(" ", argValues)}\"");
-                argValues.Clear();
-            }
+            var adaptedArgs = AppyOnePasswordTooExtensions.EscapeArgs(args);
 
             var app = new CommandLineApplication
             {
@@ -103,7 +84,7 @@ namespace Appy.Tool.OnePassword.CLI
             app.HelpOption("-h|--help");
             app.VersionOption("-v|--version", GetAssemblyVersion());
 
-            var signInOption = app.Option("-s|--signin", "Signin to 1Password account (eg: \"<organization> <email_address> <secret_key>\")", CommandOptionType.SingleValue);
+            var signInOption = app.Option("-s|--signin", "Signin to 1Password account (eg: --signin <organization> <email_address> <secret_key>)", CommandOptionType.SingleOrNoValue);
             var vaultOption = app.Option("-vt|--vault", "1Password vault to use. If not specified, it will use the last known.", CommandOptionType.SingleValue);
             var envOption = app.Option("-env|--environment", "1Password note section environment. If not specified, it will use the last known.", CommandOptionType.SingleValue);
             //var autoRenew = app.Option("-auto|--auto-renew", "Auto renew 1Password session after 30 minutes.", CommandOptionType.NoValue);
@@ -124,18 +105,14 @@ namespace Appy.Tool.OnePassword.CLI
 
                 UpdateEnvironmentVariables(session);
 
-                _logger.LogInformation($"Appy 1Password Session Started:");
-                _logger.LogInformation($"\tOrganization: {session.Organization}");
-                _logger.LogInformation($"\tVault: {session.Vault}");
-                _logger.LogInformation($"\tEnvironment: {session.Environment}");
-                _logger.LogInformation($"\tSessionToken: {session.SessionToken}");
+                _consoleVisualizer.Render(session);
 
                 return 0;
             });
 
             try
             {
-                return await app.ExecuteAsync(argsFixed.ToArray());
+                return await app.ExecuteAsync(adaptedArgs.ToArray());
             }
             catch (CommandParsingException ex)
             {

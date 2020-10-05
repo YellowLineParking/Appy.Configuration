@@ -1,4 +1,5 @@
 using System;
+using Appy.Configuration.OnePassword.Internals;
 using Microsoft.Extensions.Configuration;
 using static Appy.Infrastructure.OnePassword.Tooling.KnownUserEnvVars;
 
@@ -35,8 +36,8 @@ namespace Appy.Configuration.OnePassword
         {
             var jsonSerializer = OnePasswordConfigurationFactory.CreateDefaultSerializer();
             var processRunner = OnePasswordConfigurationFactory.CreateDefaultProcessRunner();
-            var userEnvironmentAccessor = OnePasswordConfigurationFactory.CreateDefaultUserEnvironmentAccessor();
-            var tool = OnePasswordConfigurationFactory.CreateDefaultOnePasswordTool(jsonSerializer, processRunner, userEnvironmentAccessor);
+            var logger = OnePasswordConfigurationFactory.EmptyLogger();
+            var tool = OnePasswordConfigurationFactory.CreateDefaultOnePasswordTool(jsonSerializer, processRunner, logger);
 
             var source = new OnePasswordConfigurationSource(
                 tool,

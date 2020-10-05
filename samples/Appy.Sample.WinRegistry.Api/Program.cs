@@ -21,6 +21,7 @@ namespace Appy.Sample.WinRegistry.Api
                 .ConfigureAppConfiguration((hostingContext, builder) =>
                 {
                     // 1 - Load without any extension
+                    builder.Sources.Clear();
 
                     builder
                         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
@@ -32,6 +33,7 @@ namespace Appy.Sample.WinRegistry.Api
                         builder
                             .AddRegistrySection(() => Microsoft.Win32.Registry.CurrentUser, "Software\\YOUR_ORG\\Settings");
                     }
+
                 })
 
                 // 2 - Using a custom extension with pre-configured settings for your organization

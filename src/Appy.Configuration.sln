@@ -24,6 +24,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{F90AF1CE-28C4-41FB-88C3-7E377F6840A9}"
 	ProjectSection(SolutionItems) = preProject
 		..\build.cake = ..\build.cake
+		..\functions.cake = ..\functions.cake
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Appy.Configuration.Tests", "Appy.Configuration.Tests\Appy.Configuration.Tests.csproj", "{F7E726A6-E669-40BC-AB4D-ECB8008A8A32}"

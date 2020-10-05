@@ -65,17 +65,17 @@ namespace Appy.Configuration.OnePassword
         /// <summary>
         /// 1Password organization vault (eg: Development)
         /// </summary>
-        public string Vault { get; }
+        public string Vault { get; set; }
 
         /// <summary>
         /// Execution environment to load from the 1Password note section.
         /// </summary>
-        public string Environment { get; }
+        public string Environment { get; set; }
 
         /// <summary>
         /// 1Password Session Token. The session will last 30 min after you signin with the command line tool.
         /// </summary>
-        public string SessionToken { get; }
+        public string SessionToken { get; set; }
 
         /// <inheritdoc />
         public IConfigurationProvider Build(IConfigurationBuilder builder) =>

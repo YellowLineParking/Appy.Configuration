@@ -6,16 +6,11 @@ namespace Appy.Tool.OnePassword
 {
     class Program
     {
-        static int Main(string[] args)
-        {
-            var serviceCollection = new ServiceCollection()
-                .AddToolDependencies();
-
-            var serviceProvider = serviceCollection.BuildServiceProvider();
-
-            var toolCLI = serviceProvider.GetService<IAppyOnePasswordToolCLI>();
-            var exitCode = toolCLI.ExecuteAsync(args).GetAwaiter().GetResult();
-            return exitCode;
-        }
+        static int Main(string[] args) =>
+            new ServiceCollection()
+                .AddToolDependencies()
+                .BuildServiceProvider()
+                .GetService<IAppyOnePasswordToolCLI>()
+                .ExecuteAsync(args).GetAwaiter().GetResult();
     }
 }

@@ -8,9 +8,6 @@ namespace Appy.Infrastructure.OnePassword.Tooling
 {
     public class OnePasswordUserEnvironmentAccessor : IOnePasswordUserEnvironmentAccessor
     {
-        static readonly IReadOnlyList<string> AllowedEnvironments = new string[] {"DEV", "QA", "LIVE"};
-        static readonly string AllowedEnvironmentsFormatted = string.Join(" ,", AllowedEnvironments);
-
         public string GetOrganization() => GetUserEnvironmentVariable(OnePasswordOrganization);
 
         public string GetExecutionEnvironment() => GetUserEnvironmentVariable(OnePasswordEnvironment);
@@ -29,7 +26,7 @@ namespace Appy.Infrastructure.OnePassword.Tooling
         public void SetExecutionEnvironment(string? environment)
         {
             if (string.IsNullOrWhiteSpace(environment)) throw new ArgumentException("1Password Execution Environment must be specified", nameof(environment));
-            if (!AllowedEnvironments.Contains(environment)) throw new ArgumentException($"1Password Execution Environment should be valid (eg: {AllowedEnvironmentsFormatted})", nameof(environment));
+
             SetUserEnvironmentVariable(OnePasswordEnvironment, environment);
         }
 

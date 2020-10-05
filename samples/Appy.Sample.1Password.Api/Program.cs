@@ -31,17 +31,26 @@ namespace Appy.Sample.OnePassword.Api
                         // Options to load 1Password settings
 
                         // 1.1  Load 1Password settings for the environment with the values manually setted for this session:
-                        builder.Add1Password(
-                            appName: "Appy.Sample.1Password.Api",
-                            organization: "appyway",
-                            vault: "Development",
-                            environment: "QA",
-                            sessionToken: "1Password session token obtained with the command line");
+                        //builder.Add1Password(
+                        //    appName: "Appy.Sample.1Password.Api",
+                        //    organization: "appyway",
+                        //    vault: "Development",
+                        //    environment: "QA",
+                        //    sessionToken: "1Password session token obtained with the command line");
 
-                        // 1.2  Load 1Password settings following the Appy conventions and the Appy external Tool
-                        // to initialize a session for your organization and environment:
-                        // builder.Add1Password(
-                        //    appName: "Appy.Sample.1Password.Api");
+                        // 1.2  Load 1Password settings following the Appy conventions with Appy 1Password Tool
+                        // to initialize a session for your organization with the pre-configured environment and vault.
+                        builder.Add1Password(
+                            appName: "Appy.Sample.1Password.Api");
+
+                        // 1.3  Load 1Password settings following the Appy conventions with the Appy 1Password Tool
+                        // to initialize a session for your organization with given a custom environment and vault.
+                        //builder.Add1Password(
+                        //   appName: "Appy.Sample.1Password.Api", source =>
+                        //   {
+                        //       source.Vault = "Private";
+                        //       source.Environment = "Local";
+                        //   });
                     }
                 })
 

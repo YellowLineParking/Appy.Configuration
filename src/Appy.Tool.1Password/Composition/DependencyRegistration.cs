@@ -1,4 +1,5 @@
 using Appy.Configuration.IO;
+using Appy.Configuration.Logging;
 using Appy.Configuration.Serializers;
 using Appy.Infrastructure.OnePassword.Tooling;
 using Appy.Tool.OnePassword.CLI;
@@ -15,9 +16,10 @@ namespace Appy.Tool.OnePassword.Composition
                 .AddSingleton<IAppyJsonSerializer, NewtonsoftAppyJsonSerializer>()
                 .AddSingleton<IProcessRunner, DefaultProcessRunner>()
                 .AddSingleton<IOnePasswordTool, OnePasswordTool>()
-                .AddSingleton<ILogger, ConsoleLogger>()
                 .AddSingleton<IOnePasswordUserEnvironmentAccessor, OnePasswordUserEnvironmentAccessor>()
-                .AddSingleton<IAppyOnePasswordToolCLI, AppyOnePasswordToolCLI>();
+                .AddSingleton<IAppyOnePasswordToolCLI, AppyOnePasswordToolCLI>()
+                .AddSingleton<ILogger, ConsoleLogger>()
+                .AddSingleton<IConsoleVisualzer, ConsoleVisualizer>();
 
             return services;
         }
