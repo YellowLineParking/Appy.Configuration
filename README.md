@@ -16,14 +16,16 @@ Configuration providers for NETCore 2.2, 3.0 and 3.1+.
 
 ## Table of Contents
 
-1. [Windows Registry Configuration Provider](#windows-registry-configuration-provider)  
-    1.1. [Example](#windows-registry-example)    
-2. [1Password Configuration Provider](#1password-configuration-provider)
-    2.1. [Prerequisites](#1password-prerequisites)
-    2.2. [Signin to 1Password](#signin-to-1password)
-    2.3. [Example](#1password-example)
-    2.4. [Appy dotnet Tool](#appy-dotnet-tool)
-    2.5. [Example](#appy-dotnet-tool-example)
+- [Windows Registry Configuration Provider](#windows-registry-configuration-provider)
+    * [Installing](#installing)
+    * [Usage](#usage)
+- [1Password Configuration Provider](#1password-configuration-provider)        
+    * [Installing](#installing-1)
+    * [Usage](#usage-1)   
+- [Appy 1Password Tool](#appy-1password-tool)
+    * [Prerequisites](#prerequisites)
+    * [Installing](#installing-3)
+    * [Signin to 1Password](#signin-to-1password)      
 
 ## Windows Registry Configuration Provider
 
@@ -31,16 +33,28 @@ The Windows registry has been with us for a long time and has served us well. Es
 
 With this extension you can easily configure the loading of values from a section of your windows registry to your NETCore project configuration builder.
 
-### Windows Registry Example
+### Installing 
 
-Let's imagine we have a configuration file like the following appSettings.json:
+Install using the [Appy.Configuration.WinRegistry NuGet package](https://www.nuget.org/packages/Appy.Configuration.WinRegistry):
+
+```
+PM> Install-Package Appy.Configuration.WinRegistry
+```
+
+### Usage
+
+When you install the package, it should be added to your _csproj_ file. Alternatively, you can add it directly by adding:
+
+```xml
+<PackageReference Include="Appy.Configuration.WinRegistry" Version="0.1.0" />
+```
+
+Now let's imagine we have a configuration file like the following appSettings.json:
 
 ```json
-...
 "Database": {
     "ConnectionString": ""
 }
-...
 ```
 
 And a user windows registry section like:
@@ -55,7 +69,7 @@ With the following values:
 Database:ConnectionString: "Data Source=(LocalDb)\\mssqllocaldb;Initial Catalog=local-org-database;Integrated Security=True"
 ```
 
-Then, the only thing we need to do is register an action to load the configuration values on our Program.cs. 
+Then, the only thing we need to do is register an action to load the configuration values on our Program.cs file. 
 
 ```csharp
 public class Program
@@ -65,15 +79,18 @@ public class Program
 
     public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration(builder => 
+            .ConfigureAppConfiguration((hostingContext, builder) => 
             {
-                builder.AddRegistrySection(() => Microsoft.Win32.Registry.CurrentUser, "Software\\YOUR_ORG\\Settings");
+                if (hostingContext.HostingEnvironment.IsDevelopment())
+                {
+                    builder.AddRegistrySection(() => Microsoft.Win32.Registry.CurrentUser, "Software\\YOUR_ORG\\Settings");
+                }
             }
             .UseStartup<Startup>();
 }    
 ```
 
-And this way we will have our configuration values ready to use like with any appSettings.json:
+And this way we will have our configuration values ready to use like with any appsettings.json:
 
 ```csharp
 public class Startup
@@ -109,7 +126,7 @@ QA   -> "Software\\YOUR_ORG\\QA_Settings\\Database:ConnectionString"
 LIVE -> "Software\\YOUR_ORG\\LIVE_Settings\\Database:ConnectionString"
 ```
 
-Then we would only have to rename the registry environment folder key that we want to use to 'Settings', 
+Then we would only have to rename the registry environment folder key that we want to 'Settings', 
 every time we need it and return the previous one to its original name.
 
 ```
@@ -175,13 +192,130 @@ public static class YourOrgConfigurationExtensions
 }
 ```
 
+You can find more examples on the samples folder.
+
 ## 1Password Configuration Provider
+
+1Password is one of those services that makes our life easier every day, storing all our passwords in a secure manner.
+
+With this extension you can extend the power of 1Password and easily configure the loading of settings from 1Password to your NETCore project configuration builder.
+
+### Installing 
+
+Install using the [Appy.Configuration.1Password NuGet package](https://www.nuget.org/packages/Appy.Configuration.1Password):
+
+```
+PM> Install-Package Appy.Configuration.1Password
+```
+
+### Usage
+
+When you install the package, it should be added to your _csproj_ file. Alternatively, you can add it directly by adding:
+
+```xml
+<PackageReference Include="Appy.Configuration.1Password" Version="0.1.0" />
+```
+
+Let's imagine we have a configuration file like the following appsettings.json file:
+
+```json
+"Database": {
+    "ConnectionString": ""
+}
+```
+
+And your project settings on 1Password. You should create a secure note on your personal or organization vault with a section and settings for each environment you need.
+
+![Secure Note Example](resources/screenshots/op-note-appsettings.png)
+
+With the following values:
+
+```csharp
+Database:ConnectionString: "Data Source=(LocalDb)\\mssqllocaldb;Initial Catalog=local-org-database;Integrated Security=True"
+```
+
+Then, the only thing we need to do is register an action to load the configuration values on our Program.cs. 
+
+```csharp
+public class Program
+{
+    public static void Main(string[] args) =>    
+        CreateWebHostBuilder(args).Build().Run();    
+
+    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureAppConfiguration((hostingContext, builder) => 
+            {                
+                builder
+                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                    .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
+                    .AddEnvironmentVariables();
+
+                if (hostingContext.HostingEnvironment.IsDevelopment())
+                {
+                    // Load 1Password settings following the Appy conventions with Appy 1Password Tool.
+                    builder.Add1Password("Appy.Sample.1Password.Api");
+                }
+            }
+            .UseStartup<Startup>();
+}    
+```
+
+And this way we will have our configuration values ready to use like with any appsettings.json:
+
+```csharp
+public class Startup
+{
+    readonly IWebHostEnvironment _host;
+    readonly IConfiguration _config;
+
+    public Startup(IConfiguration config, IWebHostEnvironment host)
+    {
+        _host = host;
+        _config = config;
+    }
+        
+    public void ConfigureServices(IServiceCollection services)
+    {
+        var databaseSettings = new DatabaseSettings();
+        
+        var databaseSettings = _config.GetSection("Database").Bind(databaseSettings);
+        ....
+    }
+}
+
+public class DatabaseSettings
+{
+    public string ConnectionString { get; set; }
+}
+```
+
+Then would come the part where we communicate with 1Password and get these settings. We have created a command line tool that facilitates the process in a 
+single command and allows you to create a session with some pre-configured settings. More on that below [Appy 1Password Tool](#appy-1password-tool).
+
+You can find more examples on the samples folder.
+
+## Appy 1Password Tool
+
+The Appy 1Password Tool is a dotnet tool that works as a wrapper around the official [1Password command-line tool](https://1password.com/downloads/command-line/). Following some basic conventions it will help you to start a 1Password session, so later you can run and debug locally any dotnet project using the preconfigured AppSettings saved on 1Password.
+
+The tool allows you to create a session and later set the following user environment variables to be loaded by your project through the 1Password Configuration Provider extensions:
+
+User environment variables conventions:
+
+```
+- appy_organization
+- appy_vault
+- appy_env
+- appy_session_token
+```
 
 ### Prerequisites
 
-First, we should install the [1Password CLI](https://support.1password.com/command-line/). 
+First, we should install the official [1Password CLI](https://support.1password.com/command-line/). 
 
 #### Windows
+
 For an easy installation, we recommend that you first install [Chocolatey Package Manager](https://chocolatey.org/install).
 
 Open a Powershell console and install 1Password CLI:
@@ -191,6 +325,7 @@ choco install op
 ```
 
 #### MacOS
+
 For an easy installation, we recommend that you first install [Brew Package Manager](https://brew.sh/).
 
 Open a console and install 1Password CLI using brew cask:
@@ -203,58 +338,60 @@ brew cask install 1password-cli
 
 Please, follow the official ['Getting started docs from 1Password'](https://support.1password.com/command-line-getting-started/)
 
-### Signin to 1Password:
+## Installing
 
-#### First Time access
+Install the tool globally.
 
-Execute the next command to signin to 1Password using the CLI.
+```console
+dotnet tool install -g appy-op
 ```
-op signin <yourorg.1password.com> <email-address> <secret_key>
+
+## Signin to 1Password
+
+### First Time access
+
+Execute the next command to signin to 1Password and set the vault and environment to load:
+
+```console
+appy-op --signin <yourorg.1password.com> <email-address> <secret_key> --vault Development --env QA
 ```
 
-You can get all these data from your 1Password Desktop or Mobile App account details.
+You can get these data from your 1Password Desktop or Mobile App account details.
 
 Then, it will ask for your password.
 
-#### Later time access
+A normal session will look like this:
+
+```console
+appy-op --signin yourorg.1password.com your_name@yourorg.com secretkey --vault Development --env QA
+
+Enter the password for your_name@yourorg.com at yourorg.1password.com:
+...
+
+Appy 1Password session started:
++------------------------------------------------------------+
+| Organization | youorg                                      |
+| Vault        | Development                                 |
+| Environment  | DEV                                         |
+| SessionToken | 1password session token                     |
++------------------------------------------------------------+
+
+You can now go to your project and start your debug session.
+Session tokens expire after 30 minutes of inactivity, after which you'll need to sign in again.
+```
+
+### Later time access
 
 For subsequent accesses, it will only be necessary the next command:
 
 ```console
-op signin yourorg
+appy-op --signin (or -s)
 ```
+or if you want to change the current vault or environment:
 
-#### Session Expiration
-
-It is necessary to know that 1Password sessions with automatically expire after 30 minutes of inactivity, otherwise, the session will be renewed for another 30 minutes.
-
-### 1Password Example
-
-![Secure Note Example](resources/screenshots/op-note-appsettings.png)
-
-TODO
-
-### 1Password dotnet Tool
-
-The Appy 1Password Tool is a dotnet tool that works as a wrapper around the official (1Password command-line tool)[https://1password.com/downloads/command-line/]
-to start a 1Password session, and following some basic conventions it will help you to run and debug locally any dotnet project using the preconfigured AppSettings for the project saved on 1Password.
-
-The tool allows you to create a session and later set the following environment variables to be loaded by your project through the 1Password Configuration Provider extensions:
-
-Environment variables conventions:
+```console
+appy-op -s -vt Custom -env DEV
 ```
-- appy_organization
-- appy_vault
-- appy_env
-- appy_session_token
-```
-
-## Install the tool globally
-```
-dotnet tool install -g appy-op
-```
-
-TODO 
 
 ## Contribute
 It would be awesome if you would like to contribute code or help with bugs. Just follow the guidelines [CONTRIBUTING](https://github.com/YellowLineParking/Appy.Configuration/blob/master/CONTRIBUTING.md).

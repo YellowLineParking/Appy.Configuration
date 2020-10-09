@@ -15,7 +15,7 @@ namespace Appy.Sample.OnePassword.Api
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
 
-                // Options to load your settings
+                // Options to load your project settings
 
                 .ConfigureAppConfiguration((hostingContext, builder) =>
                 {
