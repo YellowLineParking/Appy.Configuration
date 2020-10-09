@@ -10,9 +10,9 @@ Configuration providers for NETCore 2.2, 3.0 and 3.1+.
 
 | Package | Latest Stable |
 | --- | --- |
-| [Appy.Configuration.WinRegistry](https://www.nuget.org/packages/Appy.Configuration.WinRegistry) | [![Nuget Package](https://img.shields.io/badge/nuget-2.5.1-blue.svg)](https://www.nuget.org/packages/Appy.Configuration.WinRegistry) |
-| [Appy.Configuration.1Password](https://www.nuget.org/packages/Appy.Configuration.1Password) | [![Nuget Package](https://img.shields.io/badge/nuget-2.5.1-blue.svg)](https://www.nuget.org/packages/Appy.Configuration.1Password) |
-| [Appy.Tool.1Password](https://www.nuget.org/packages/Appy.Tool.1Password) | [![Nuget Package](https://img.shields.io/badge/nuget-2.5.1-blue.svg)](https://www.nuget.org/packages/Appy.Tool.1Password) |
+| [Appy.Configuration.WinRegistry](https://www.nuget.org/packages/Appy.Configuration.WinRegistry) | [![Nuget Package](https://img.shields.io/badge/nuget-0.1.0-blue.svg)](https://www.nuget.org/packages/Appy.Configuration.WinRegistry) |
+| [Appy.Configuration.1Password](https://www.nuget.org/packages/Appy.Configuration.1Password) | [![Nuget Package](https://img.shields.io/badge/nuget-0.1.0-blue.svg)](https://www.nuget.org/packages/Appy.Configuration.1Password) |
+| [Appy.Tool.1Password](https://www.nuget.org/packages/Appy.Tool.1Password) | [![Nuget Package](https://img.shields.io/badge/nuget-0.1.0-blue.svg)](https://www.nuget.org/packages/Appy.Tool.1Password) |
 
 ## Table of Contents
 

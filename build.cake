@@ -8,7 +8,7 @@ var taskConfigManager = new ProjectTaskConfigurationManager();
 var projectConfigs = new ProjectConfigLoader().Load(Context, configFilePath).Projects;
 var basePath = "./src";
 var artifactsPath = Context.Directory("./.artifacts");
-var target = Argument("target", "Test");
+var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 
 ////////////////////////////////////////////////////////////////

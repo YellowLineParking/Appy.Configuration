@@ -19,7 +19,7 @@
     <Authors>Jorge Rodríguez Galán</Authors>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/YellowLineParking/Appy.Configuration</RepositoryUrl>
-    <PackageIcon>appyway-logo.png</PackageIcon>
+    <PackageIcon>small-logo.png</PackageIcon>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageProjectUrl>https://github.com/YellowLineParking/Appy.Configuration</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
