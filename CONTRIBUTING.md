@@ -28,7 +28,7 @@ with a fix.
 
 ## <a name="feature"></a> Want a Feature?
 
-You can request a new feature by submitting an issue to our [GitHub Repository](https://github.com/YellowLineParking/Appy.Configuration).  If you
+You can request a new feature by submitting an issue to our [GitHub Repository](https://github.com/YellowLineParking/Appy.Configuration). If you
 would like to implement a new feature then consider what kind of change it is:
 
   prevent duplication of work, and help you to craft the change so that it is successfully accepted
