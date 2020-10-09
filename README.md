@@ -10,9 +10,9 @@ Configuration providers for NETCore 2.2, 3.0 and 3.1+.
 
 | Package | Latest Stable |
 | --- | --- |
-| [Appy.Configuration.WinRegistry](https://www.nuget.org/packages/Appy.Configuration.WinRegistry) | [![Nuget Package](https://img.shields.io/badge/nuget-0.1.0-blue.svg)](https://www.nuget.org/packages/Appy.Configuration.WinRegistry) |
-| [Appy.Configuration.1Password](https://www.nuget.org/packages/Appy.Configuration.1Password) | [![Nuget Package](https://img.shields.io/badge/nuget-0.1.0-blue.svg)](https://www.nuget.org/packages/Appy.Configuration.1Password) |
-| [Appy.Tool.1Password](https://www.nuget.org/packages/Appy.Tool.1Password) | [![Nuget Package](https://img.shields.io/badge/nuget-0.1.0-blue.svg)](https://www.nuget.org/packages/Appy.Tool.1Password) |
+| [Appy.Configuration.WinRegistry](https://www.nuget.org/packages/Appy.Configuration.WinRegistry) | [![Nuget Package](https://img.shields.io/badge/nuget-0.2.0-blue.svg)](https://www.nuget.org/packages/Appy.Configuration.WinRegistry) |
+| [Appy.Configuration.1Password](https://www.nuget.org/packages/Appy.Configuration.1Password) | [![Nuget Package](https://img.shields.io/badge/nuget-0.2.0-blue.svg)](https://www.nuget.org/packages/Appy.Configuration.1Password) |
+| [appy-op](https://www.nuget.org/packages/appy-op) | [![Nuget Package](https://img.shields.io/badge/nuget-0.2.0-blue.svg)](https://www.nuget.org/packages/appy-op) |
 
 ## Table of Contents
 
@@ -24,7 +24,7 @@ Configuration providers for NETCore 2.2, 3.0 and 3.1+.
     * [Usage](#usage-1)   
 - [Appy 1Password Tool](#appy-1password-tool)
     * [Prerequisites](#prerequisites)
-    * [Installing](#installing-3)
+    * [Installing](#installing-2)
     * [Signin to 1Password](#signin-to-1password)      
 
 ## Windows Registry Configuration Provider
@@ -304,10 +304,10 @@ The tool allows you to create a session and later set the following user environ
 User environment variables conventions:
 
 ```
-- appy_organization
-- appy_vault
-- appy_env
-- appy_session_token
+- appy_op_organization
+- appy_op_vault
+- appy_op_env
+- appy_op_session_token
 ```
 
 ### Prerequisites
