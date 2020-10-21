@@ -10,9 +10,9 @@ Configuration providers for NETCore 2.2, 3.0 and 3.1+.
 
 | Package | Latest Stable |
 | --- | --- |
-| [Appy.Configuration.WinRegistry](https://www.nuget.org/packages/Appy.Configuration.WinRegistry) | [![Nuget Package](https://img.shields.io/badge/nuget-0.2.0-blue.svg)](https://www.nuget.org/packages/Appy.Configuration.WinRegistry) |
-| [Appy.Configuration.1Password](https://www.nuget.org/packages/Appy.Configuration.1Password) | [![Nuget Package](https://img.shields.io/badge/nuget-0.2.0-blue.svg)](https://www.nuget.org/packages/Appy.Configuration.1Password) |
-| [appy-op](https://www.nuget.org/packages/appy-op) | [![Nuget Package](https://img.shields.io/badge/nuget-0.2.0-blue.svg)](https://www.nuget.org/packages/appy-op) |
+| [Appy.Configuration.WinRegistry](https://www.nuget.org/packages/Appy.Configuration.WinRegistry) | [![Nuget Package](https://img.shields.io/badge/nuget-0.3.0-blue.svg)](https://www.nuget.org/packages/Appy.Configuration.WinRegistry) |
+| [Appy.Configuration.1Password](https://www.nuget.org/packages/Appy.Configuration.1Password) | [![Nuget Package](https://img.shields.io/badge/nuget-0.3.0-blue.svg)](https://www.nuget.org/packages/Appy.Configuration.1Password) |
+| [appy-op](https://www.nuget.org/packages/appy-op) | [![Nuget Package](https://img.shields.io/badge/nuget-0.3.0-blue.svg)](https://www.nuget.org/packages/appy-op) |
 
 ## Table of Contents
 
@@ -46,7 +46,7 @@ PM> Install-Package Appy.Configuration.WinRegistry
 When you install the package, it should be added to your _csproj_ file. Alternatively, you can add it directly by adding:
 
 ```xml
-<PackageReference Include="Appy.Configuration.WinRegistry" Version="0.1.0" />
+<PackageReference Include="Appy.Configuration.WinRegistry" Version="0.3.0" />
 ```
 
 Now let's imagine we have a configuration file like the following appSettings.json:
@@ -213,7 +213,7 @@ PM> Install-Package Appy.Configuration.1Password
 When you install the package, it should be added to your _csproj_ file. Alternatively, you can add it directly by adding:
 
 ```xml
-<PackageReference Include="Appy.Configuration.1Password" Version="0.1.0" />
+<PackageReference Include="Appy.Configuration.1Password" Version="0.3.0" />
 ```
 
 Let's imagine we have a configuration file like the following appsettings.json file:
@@ -299,9 +299,9 @@ You can find more examples on the samples folder.
 
 The Appy 1Password Tool is a dotnet tool that works as a wrapper around the official [1Password command-line tool](https://1password.com/downloads/command-line/). Following some basic conventions it will help you to start a 1Password session, so later you can run and debug locally any dotnet project using the preconfigured AppSettings saved on 1Password.
 
-The tool allows you to create a session and later set the following user environment variables to be loaded by your project through the 1Password Configuration Provider extensions:
+The tool allows you to create a session and later save the following user environment variables to be loaded by your project through the 1Password Configuration Provider extensions:
 
-User environment variables conventions:
+User environment variables:
 
 ```
 - appy_op_organization
@@ -309,6 +309,8 @@ User environment variables conventions:
 - appy_op_env
 - appy_op_session_token
 ```
+
+* No password is stored on your machine, only the data of your session in your user environment variables.
 
 ### Prerequisites
 
@@ -369,6 +371,8 @@ appy-op --signin yourorg your_name@yourorg.com secretkey --vault Development -en
 Enter the password for your_name@yourorg.com at yourorg.1password.com:
 ...
 
+Updating user environment variables.
+
 Appy 1Password session started:
 +------------------------------------------------------------+
 | Organization | youorg                                      |
@@ -392,6 +396,20 @@ or if you want to change the current vault or environment:
 
 ```console
 appy-op -s -vt Custom -env DEV
+```
+
+### Auto-renew session activity
+
+1Password sessions have an expiration time of 30 min if there is no activity. 
+Normally that will be enough, since during our project debug session, every time we 
+load the project settings the session will be renewed for another 30 min.
+
+But for cases where we are a bit lazy, or want to go outside for a long time and want to leave 
+our session active, we have the option to signin with auto-renew. That will try to keep the session 
+active by making a simple random query to 1Password every 29 minutes.
+
+```console
+appy-op -s -a
 ```
 
 ## Contribute

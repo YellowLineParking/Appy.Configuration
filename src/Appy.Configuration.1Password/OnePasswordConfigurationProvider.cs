@@ -29,7 +29,7 @@ namespace Appy.Configuration.OnePassword
         {
             var query = new GetOnePasswordNoteQuery
             {
-                Organisation = _source.Organization,
+                Organization = _source.Organization,
                 Item = _source.AppSettingsName,
                 Vault = _source.Vault,
                 Environment = _source.Environment,
