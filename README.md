@@ -353,17 +353,18 @@ dotnet tool install -g appy-op
 Execute the next command to signin to 1Password and set the vault and environment to load:
 
 ```console
-appy-op --signin <yourorg.1password.com> <email-address> <secret_key> --vault Development --env QA
+appy-op --signin <yourorg> <email-address> <secret_key> --vault Development -env QA
 ```
+*Note: make sure to use the Secret Key and not the Master Password*
 
 You can get these data from your 1Password Desktop or Mobile App account details.
 
-Then, it will ask for your password.
+Then, it will ask for your Master Password.
 
 A normal session will look like this:
 
 ```console
-appy-op --signin yourorg.1password.com your_name@yourorg.com secretkey --vault Development --env QA
+appy-op --signin yourorg your_name@yourorg.com secretkey --vault Development -env QA
 
 Enter the password for your_name@yourorg.com at yourorg.1password.com:
 ...

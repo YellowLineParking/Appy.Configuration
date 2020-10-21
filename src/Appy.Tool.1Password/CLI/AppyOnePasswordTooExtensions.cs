@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using Appy.Configuration.Serializers;
-using Appy.Infrastructure.OnePassword.Tooling;
 
 namespace Appy.Tool.OnePassword.CLI
 {

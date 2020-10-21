@@ -1,5 +1,4 @@
 using Appy.Configuration.WinRegistry;
-using Appy.Sample.WinRegistry.Api.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
