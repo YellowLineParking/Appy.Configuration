@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Appy.Configuration.Logging;
@@ -7,7 +6,6 @@ using Appy.Infrastructure.OnePassword.Commands;
 using Appy.Infrastructure.OnePassword.Tooling;
 using Appy.Tool.OnePassword.Logging;
 using McMaster.Extensions.CommandLineUtils;
-using Spectre.Console;
 
 namespace Appy.Tool.OnePassword.CLI
 {

@@ -1,4 +1,3 @@
-using System;
 using Appy.Sample.WinRegistry.Api.Composition;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
