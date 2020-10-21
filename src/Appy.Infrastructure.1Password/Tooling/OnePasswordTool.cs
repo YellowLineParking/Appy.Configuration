@@ -53,6 +53,25 @@ namespace Appy.Infrastructure.OnePassword.Tooling
             return processRunner.Run(ToolPath, processSettings);
         }
 
+        static Task<ProcessResult> GetVaults(IProcessRunner processRunner, string organization, string sessionToken)
+        {
+            var arguments = new ProcessArgumentBuilder();
+            arguments.Append("list");
+            arguments.Append("vaults");
+
+            var processSettings = new ProcessSettings
+            {
+                Arguments = arguments,
+                EnvironmentVariables = new Dictionary<string, string>()
+            };
+
+            var sessionEnvName = $"OP_SESSION_{organization}";
+
+            processSettings.EnvironmentVariables.Add(sessionEnvName, sessionToken);
+
+            return processRunner.Run(ToolPath, processSettings);
+        }
+
         static Task<ProcessResult> Signin(IProcessRunner processRunner, ILogger logger, SignInOnePasswordCommand command)
         {
             var arguments = new ProcessArgumentBuilder();
@@ -94,7 +113,7 @@ namespace Appy.Infrastructure.OnePassword.Tooling
         {
             var processResult = await GetItem(
                 processRunner: _processRunner,
-                organization: query.Organisation,
+                organization: query.Organization,
                 vault: query.Vault,
                 item: query.Item,
                 sessionToken: query.SessionToken);
@@ -124,6 +143,38 @@ namespace Appy.Infrastructure.OnePassword.Tooling
             var queryResult = new GetOnePasswordNoteQueryResult
             {
                 EnvironmentSection = environmentSection
+            };
+
+            return queryResult;
+        }
+
+        ///<inheritdoc cref="IOnePasswordTool"/>
+        public async Task<GetOnePasswordVaultsQueryResult> Execute(GetOnePasswordVaultsQuery query, CancellationToken cancellationToken = default)
+        {
+            var processResult = await GetVaults(
+                processRunner: _processRunner,
+                organization: query.Organization,
+                sessionToken: query.SessionToken);
+
+            if (!processResult.Success)
+            {
+                throw new OnePasswordToolException($"1Password internal CLI failed with exit code {processResult.ExitCode}: {processResult.StandardError}");
+            }
+
+            IList<OnePasswordVault> vaults;
+
+            try
+            {
+                vaults = _jsonSerializer.Deserialize<IList<OnePasswordVault>>(processResult.StandardOutput);
+            }
+            catch (Exception ex)
+            {
+                throw new OnePasswordToolException("1Password Tool failed deserialization", ex);
+            }
+
+            var queryResult = new GetOnePasswordVaultsQueryResult
+            {
+                Vaults = vaults
             };
 
             return queryResult;

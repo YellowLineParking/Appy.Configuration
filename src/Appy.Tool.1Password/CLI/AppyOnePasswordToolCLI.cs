@@ -1,8 +1,10 @@
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Appy.Configuration.Logging;
 using Appy.Infrastructure.OnePassword.Commands;
+using Appy.Infrastructure.OnePassword.Queries;
 using Appy.Infrastructure.OnePassword.Tooling;
 using Appy.Tool.OnePassword.Logging;
 using McMaster.Extensions.CommandLineUtils;
@@ -15,7 +17,9 @@ namespace Appy.Tool.OnePassword.CLI
         readonly IConsoleVisualzer _consoleVisualizer;
         readonly IOnePasswordUserEnvironmentAccessor _environmentAccessor;
         readonly IOnePasswordTool _onePasswordTool;
+        const int AutoRenewDelayInMins = 29;
         static string GetAssemblyVersion() => typeof(AppyOnePasswordToolCLI).Assembly.GetName().Version.ToString();
+
         public AppyOnePasswordToolCLI(
             ILogger logger,
             IConsoleVisualzer consoleVisualizer,
@@ -69,6 +73,28 @@ namespace Appy.Tool.OnePassword.CLI
             _environmentAccessor.SetSessionToken(session.SessionToken);
         }
 
+        async Task AutoRenewSessionActivity(AppyOnePasswordSession session, CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                _logger.LogInformation($"Your session activity will be auto renewed in {AutoRenewDelayInMins} min.");
+
+                await Task.Delay(TimeSpan.FromMinutes(AutoRenewDelayInMins));
+
+                var query = new GetOnePasswordVaultsQuery
+                {
+                    Organization = session.Organization,
+                    SessionToken = session.SessionToken
+                };
+
+                _logger.LogInformation($"Self-renewing the session activity after {AutoRenewDelayInMins} min.");
+
+                await _onePasswordTool.Execute(query, cancellationToken);
+
+                _logger.LogInformation($"Session activity automatically renewed after {AutoRenewDelayInMins} min.");
+            }
+        }
+
         public async Task<int> ExecuteAsync(params string[] args)
         {
             var adaptedArgs = AppyOnePasswordTooExtensions.EscapeArgs(args);
@@ -85,7 +111,7 @@ namespace Appy.Tool.OnePassword.CLI
             var signInOption = app.Option("-s|--signin", "Signin to 1Password account (eg: --signin <organization> <email_address> <secret_key>)", CommandOptionType.SingleOrNoValue);
             var vaultOption = app.Option("-vt|--vault", "1Password vault to use. If not specified, it will use the last known.", CommandOptionType.SingleValue);
             var envOption = app.Option("-env|--environment", "1Password note section environment. If not specified, it will use the last known.", CommandOptionType.SingleValue);
-            //var autoRenew = app.Option("-auto|--auto-renew", "Auto renew 1Password session after 30 minutes.", CommandOptionType.NoValue);
+            var autoRenew = app.Option("-a|--auto-renew", "Automatically renew 1Password session activity before the 30 min expire.", CommandOptionType.NoValue);
 
             app.OnExecuteAsync(async cancellationToken =>
             {
@@ -101,9 +127,19 @@ namespace Appy.Tool.OnePassword.CLI
                     environment: environment,
                     sessionToken: signInResult.SessionToken);
 
+                _logger.LogInformation("Updating user environment variables.");
+
                 UpdateEnvironmentVariables(session);
 
                 _consoleVisualizer.Render(session);
+
+                if (!autoRenew.HasValue())
+                {
+                    return 0;
+                }
+
+                var foreverCancellationTokenSource = new CancellationTokenSource();
+                await AutoRenewSessionActivity(session, foreverCancellationTokenSource.Token);
 
                 return 0;
             });
