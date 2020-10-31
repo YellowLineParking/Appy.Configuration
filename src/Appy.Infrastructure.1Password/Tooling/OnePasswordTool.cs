@@ -91,6 +91,7 @@ namespace Appy.Infrastructure.OnePassword.Tooling
                 while (true)
                 {
                     var line = await sr.ReadLineAsync(new StringBuilder());
+                    if (line == null) return;
                     logger.LogInformation(line.Result);
                     if (!line.HasMore) return;
                 }
