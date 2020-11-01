@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Appy.Sample.OnePassword.Api
 {
@@ -25,6 +26,10 @@ namespace Appy.Sample.OnePassword.Api
             Configuration.GetSection("Database").Bind(databaseSettings);
 
             services.AddControllers();
+
+            services.AddLogging(builder => builder
+                .AddConsole()
+                .AddDebug());
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

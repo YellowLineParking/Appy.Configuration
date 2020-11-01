@@ -1,3 +1,4 @@
+using Appy.Infrastructure.OnePassword.Model;
 using Appy.Tool.OnePassword.CLI;
 using Spectre.Console;
 
@@ -17,10 +18,10 @@ namespace Appy.Tool.OnePassword.Logging
             var sessionTable = new Table()
                 .AddColumn(new TableColumn(string.Empty))
                 .AddColumn(new TableColumn(string.Empty))
-                .AddRow(nameof(AppyOnePasswordSession.Organization), session.Organization)
-                .AddRow(nameof(AppyOnePasswordSession.Vault), session.Vault)
-                .AddRow(nameof(AppyOnePasswordSession.Environment), session.Environment)
-                .AddRow(nameof(AppyOnePasswordSession.SessionToken), session.SessionToken)
+                .AddRow(nameof(AppyOnePasswordSession.Organization), session.Organization!)
+                .AddRow(nameof(AppyOnePasswordSession.Vault), session.Vault!)
+                .AddRow(nameof(AppyOnePasswordSession.Environment), session.Environment!)
+                .AddRow(nameof(AppyOnePasswordSession.SessionToken), session.SessionToken!)
                 .AsciiBorder()
                 .HideHeaders();
 

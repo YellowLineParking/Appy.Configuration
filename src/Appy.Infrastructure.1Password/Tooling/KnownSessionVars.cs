@@ -1,6 +1,6 @@
 namespace Appy.Infrastructure.OnePassword.Tooling
 {
-    public static class KnownUserEnvVars
+    public static class KnownSessionVars
     {
         public static readonly string OnePasswordOrganization = "APPY_OP_ORGANIZATION";
         public static readonly string OnePasswordEnvironment = "APPY_OP_ENVIRONMENT";
