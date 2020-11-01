@@ -299,9 +299,11 @@ You can find more examples on the samples folder.
 
 The Appy 1Password Tool is a dotnet tool that works as a wrapper around the official [1Password command-line tool](https://1password.com/downloads/command-line/). Following some basic conventions it will help you to start a 1Password session, so later you can run and debug locally any dotnet project using the preconfigured AppSettings saved on 1Password.
 
-The tool allows you to create a session and later save the following user environment variables to be loaded by your project through the 1Password Configuration Provider extensions:
+The tool allows you to create a session and later save the following information to be loaded by your project through the 1Password Configuration Provider extensions.
 
-User environment variables:
+#### Windows
+
+The session information is stored in the next user's environment variables:
 
 ```
 - APPY_OP_ORGANIZATION
@@ -311,6 +313,21 @@ User environment variables:
 ```
 
 * No password is stored on your machine, only the data of your session in your user environment variables.
+
+#### MacOs & Linux
+
+Storing environment variables globally on MacOS or Linux always seems complicated, and management varies a lot from one console to another. For this reason, the session information is store in a file (.appy-op-env) in the root folder of the current user.
+
+The file will contain the following information:
+
+```
+APPY_OP_ORGANIZATION=yourorg
+APPY_OP_VAULT=Development
+APPY_OP_ENVIRONMENT=DEV
+APPY_OP_SESSION_TOKEN=1password session token
+```
+
+* No password is stored on your machine, only the data of your session.
 
 ### Prerequisites
 
