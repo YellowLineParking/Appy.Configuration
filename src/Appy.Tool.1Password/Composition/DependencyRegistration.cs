@@ -16,7 +16,11 @@ namespace Appy.Tool.OnePassword.Composition
                 .AddSingleton<IAppyJsonSerializer, NewtonsoftAppyJsonSerializer>()
                 .AddSingleton<IProcessRunner, DefaultProcessRunner>()
                 .AddSingleton<IOnePasswordTool, OnePasswordTool>()
-                .AddSingleton<IOnePasswordUserEnvironmentAccessor, OnePasswordUserEnvironmentAccessor>()
+                .AddSingleton<OnePasswordEnvironmentSessionStorage>()
+                .AddSingleton<OnePasswordFileSessionStorage>()
+                .AddSingleton<IOnePasswordSessionStorage>(sp => new OnePasswordSessionStorageSelector(
+                    sp.GetService<OnePasswordEnvironmentSessionStorage>(),
+                    sp.GetService<OnePasswordFileSessionStorage>()))
                 .AddSingleton<IAppyOnePasswordToolCLI, AppyOnePasswordToolCLI>()
                 .AddSingleton<ILogger, ConsoleLogger>()
                 .AddSingleton<IConsoleVisualzer, ConsoleVisualizer>();

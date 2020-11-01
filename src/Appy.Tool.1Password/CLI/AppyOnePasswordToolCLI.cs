@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Appy.Configuration.Logging;
 using Appy.Infrastructure.OnePassword.Commands;
+using Appy.Infrastructure.OnePassword.Model;
 using Appy.Infrastructure.OnePassword.Queries;
 using Appy.Infrastructure.OnePassword.Tooling;
 using Appy.Tool.OnePassword.Logging;
@@ -15,7 +16,7 @@ namespace Appy.Tool.OnePassword.CLI
     {
         readonly ILogger _logger;
         readonly IConsoleVisualzer _consoleVisualizer;
-        readonly IOnePasswordUserEnvironmentAccessor _environmentAccessor;
+        readonly IOnePasswordSessionStorage _sessionStorage;
         readonly IOnePasswordTool _onePasswordTool;
         const int AutoRenewDelayInMins = 29;
         static string GetAssemblyVersion() => typeof(AppyOnePasswordToolCLI).Assembly.GetName().Version.ToString();
@@ -23,17 +24,17 @@ namespace Appy.Tool.OnePassword.CLI
         public AppyOnePasswordToolCLI(
             ILogger logger,
             IConsoleVisualzer consoleVisualizer,
-            IOnePasswordUserEnvironmentAccessor environmentAccessor,
+            IOnePasswordSessionStorage sessionStorage,
             IOnePasswordTool onePasswordTool
         )
         {
-            _logger = logger;
-            _consoleVisualizer = consoleVisualizer;
-            _environmentAccessor = environmentAccessor;
-            _onePasswordTool = onePasswordTool;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _consoleVisualizer = consoleVisualizer ?? throw new ArgumentNullException(nameof(consoleVisualizer));
+            _sessionStorage = sessionStorage ?? throw new ArgumentNullException(nameof(sessionStorage));
+            _onePasswordTool = onePasswordTool ?? throw new ArgumentNullException(nameof(onePasswordTool));
         }
-       
-        SignInOnePasswordCommand BuildSignInCommand(CommandLineApplication app, CommandOption option)
+
+        SignInOnePasswordCommand BuildSignInCommand(CommandLineApplication app, CommandOption option, AppyOnePasswordSession currentSession)
         {
             if (!option.HasValue())
             {
@@ -61,16 +62,8 @@ namespace Appy.Tool.OnePassword.CLI
 
             return new SignInOnePasswordCommand
             {
-                Organization = _environmentAccessor.GetOrganization()
+                Organization = currentSession.Organization
             };
-        }
-
-        void UpdateEnvironmentVariables(AppyOnePasswordSession session)
-        {
-            _environmentAccessor.SetOrganization(session.Organization);
-            _environmentAccessor.SetVault(session.Vault);
-            _environmentAccessor.SetExecutionEnvironment(session.Environment);
-            _environmentAccessor.SetSessionToken(session.SessionToken);
         }
 
         async Task AutoRenewSessionActivity(AppyOnePasswordSession session, CancellationToken cancellationToken)
@@ -83,8 +76,8 @@ namespace Appy.Tool.OnePassword.CLI
 
                 var query = new GetOnePasswordVaultsQuery
                 {
-                    Organization = session.Organization,
-                    SessionToken = session.SessionToken
+                    Organization = session.Organization!,
+                    SessionToken = session.SessionToken!
                 };
 
                 _logger.LogInformation($"Self-renewing the session activity after {AutoRenewDelayInMins} min.");
@@ -115,11 +108,13 @@ namespace Appy.Tool.OnePassword.CLI
 
             app.OnExecuteAsync(async cancellationToken =>
             {
-                var signInCommand = BuildSignInCommand(app, signInOption);
-                var signInResult = await _onePasswordTool.Execute(signInCommand);
+                var currentSession = await _sessionStorage.GetCurrent();
 
-                var environment = envOption.HasValue() ? envOption.Value() : _environmentAccessor.GetExecutionEnvironment();
-                var vault = vaultOption.HasValue() ? vaultOption.Value() : _environmentAccessor.GetVault();
+                var signInCommand = BuildSignInCommand(app, signInOption, currentSession);
+                var signInResult = await _onePasswordTool.Execute(signInCommand, cancellationToken);
+
+                var environment = envOption.HasValue() ? envOption.Value() : currentSession.Environment;
+                var vault = vaultOption.HasValue() ? vaultOption.Value() : currentSession.Vault;
 
                 var session = AppyOnePasswordSession.New(
                     organization: signInCommand.Organization,
@@ -127,9 +122,9 @@ namespace Appy.Tool.OnePassword.CLI
                     environment: environment,
                     sessionToken: signInResult.SessionToken);
 
-                _logger.LogInformation("Updating user environment variables.");
+                _logger.LogInformation("Updating 1Password session information.");
 
-                UpdateEnvironmentVariables(session);
+                await _sessionStorage.Update(session);
 
                 _consoleVisualizer.Render(session);
 
@@ -139,6 +134,7 @@ namespace Appy.Tool.OnePassword.CLI
                 }
 
                 var foreverCancellationTokenSource = new CancellationTokenSource();
+
                 await AutoRenewSessionActivity(session, foreverCancellationTokenSource.Token);
 
                 return 0;

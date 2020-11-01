@@ -24,7 +24,9 @@ namespace Appy.Configuration.OnePassword.Internals
                 jsonSerializer,
                 processRunner);
 
-        internal static IOnePasswordUserEnvironmentAccessor CreateDefaultUserEnvironmentAccessor() =>
-            new OnePasswordUserEnvironmentAccessor();
+        internal static IOnePasswordSessionStorage CreateDefaultSessionStorage() =>
+            new OnePasswordSessionStorageSelector(
+                new OnePasswordEnvironmentSessionStorage(),
+                new OnePasswordFileSessionStorage());
     }
 }
