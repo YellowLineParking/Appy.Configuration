@@ -14,3 +14,5 @@ Appy.Infrastructure.1Password.Tests:
   Type: XUnit
 Appy.Configuration.1Password.Tests:
   Type: XUnit
+Appy.Tool.1Password.Tests:
+  Type: XUnit

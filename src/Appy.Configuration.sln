@@ -38,6 +38,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Appy.TestTools", "Appy.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Appy.Infrastructure.1Password.Tests", "Appy.Infrastructure.1Password.Tests\Appy.Infrastructure.1Password.Tests.csproj", "{7F4BEF41-A528-45CB-8024-8FEB830CDB2A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Appy.Tool.1Password.Tests", "Appy.Tool.1Password.Tests\Appy.Tool.1Password.Tests.csproj", "{9A363BC8-20C1-4EF8-A232-E99521786D61}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -88,6 +90,10 @@ Global
 		{7F4BEF41-A528-45CB-8024-8FEB830CDB2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F4BEF41-A528-45CB-8024-8FEB830CDB2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F4BEF41-A528-45CB-8024-8FEB830CDB2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A363BC8-20C1-4EF8-A232-E99521786D61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A363BC8-20C1-4EF8-A232-E99521786D61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A363BC8-20C1-4EF8-A232-E99521786D61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A363BC8-20C1-4EF8-A232-E99521786D61}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -104,6 +110,7 @@ Global
 		{EA756FFC-F1E0-4092-BF13-25EE36D1D929} = {450B3144-2677-4626-AAD1-12C7D3702B83}
 		{4534AF32-C351-4177-B636-4A5E21B12C77} = {450B3144-2677-4626-AAD1-12C7D3702B83}
 		{7F4BEF41-A528-45CB-8024-8FEB830CDB2A} = {450B3144-2677-4626-AAD1-12C7D3702B83}
+		{9A363BC8-20C1-4EF8-A232-E99521786D61} = {450B3144-2677-4626-AAD1-12C7D3702B83}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BC2D1710-4FB1-405A-8692-A851269672FD}
