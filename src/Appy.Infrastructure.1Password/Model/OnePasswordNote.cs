@@ -6,13 +6,20 @@ namespace Appy.Infrastructure.OnePassword.Model
 {
     public class OnePasswordNote
     {
+        public OnePasswordNote WithDetails(OnePasswordNoteDetails details)
+        {
+            Details = details;
+            return this;
+        }
+
+        IReadOnlyCollection<OnePasswordSection>? GetSections() => Details?.Sections;
+
         public OnePasswordNoteDetails? Details { get; set; }
 
-        public IList<OnePasswordSection>? GetSections() => Details?.Sections;
-
-        public OnePasswordSection? GetSectionByEnvironment(string environment) =>
-            GetSections()?
-                .SingleOrDefault(section =>
-                    string.Equals(section.Title, environment, StringComparison.InvariantCulture));
+        public OnePasswordSection? GetSectionByEnvironment(string environment)
+        {
+            return GetSections()?.SingleOrDefault(section =>
+                string.Equals(section.Title, environment, StringComparison.InvariantCulture));
+        }
     }
 }

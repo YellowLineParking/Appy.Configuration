@@ -1,5 +1,4 @@
 using Appy.Infrastructure.OnePassword.Model;
-using Appy.Tool.OnePassword.CLI;
 using Spectre.Console;
 
 namespace Appy.Tool.OnePassword.Logging
@@ -27,9 +26,6 @@ namespace Appy.Tool.OnePassword.Logging
 
             var footerTable = new Table()
                 .AddColumn(new TableColumn(string.Empty))
-                .AddEmptyRow()
-                .AddRow("You can now go to your project and start your debug session.")
-                .AddRow("Session tokens expire after 30 minutes of inactivity, after which you’ll need to sign in again.")
                 .AddEmptyRow()
                 .NoBorder()
                 .HideHeaders();

@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Appy.Configuration.Common;
 using Appy.Infrastructure.OnePassword.Model;
@@ -8,31 +7,40 @@ namespace Appy.Infrastructure.OnePassword.Storage
 {
     public class OnePasswordEnvironmentSessionStorage: IOnePasswordSessionStorage
     {
-        static bool IsRunningOnWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        readonly IPlatformInformation _platformInfo;
+        readonly IEnvironmentAccessor _envAccessor;
+        
+        public OnePasswordEnvironmentSessionStorage(
+            IPlatformInformation platformInfo,
+            IEnvironmentAccessor envAccessor)
+        {
+            _platformInfo = platformInfo ?? throw new ArgumentNullException(nameof(platformInfo));
+            _envAccessor = envAccessor ?? throw new ArgumentNullException(nameof(envAccessor));
+        }
 
         public Task<AppyOnePasswordSession> GetCurrent()
         {
-            if (IsRunningOnWindows)
+            if (_platformInfo.IsRunningOnWindows())
             {
                 return Task.FromResult(AppyOnePasswordSession.New(
-                    organization: EnvironmentUtils.GetUserEnvironmentVariable(KnownSessionVars.OnePasswordOrganization),
-                    environment: EnvironmentUtils.GetUserEnvironmentVariable(KnownSessionVars.OnePasswordEnvironment),
-                    sessionToken: EnvironmentUtils.GetUserEnvironmentVariable(KnownSessionVars.OnePasswordSessionToken),
-                    vault: EnvironmentUtils.GetUserEnvironmentVariable(KnownSessionVars.OnePasswordVault)
+                    organization: _envAccessor.GetUserEnvironmentVariable(KnownSessionVars.OnePasswordOrganization),
+                    environment: _envAccessor.GetUserEnvironmentVariable(KnownSessionVars.OnePasswordEnvironment),
+                    sessionToken: _envAccessor.GetUserEnvironmentVariable(KnownSessionVars.OnePasswordSessionToken),
+                    vault: _envAccessor.GetUserEnvironmentVariable(KnownSessionVars.OnePasswordVault)
                 ));
             }
 
             return Task.FromResult(AppyOnePasswordSession.New(
-                organization: EnvironmentUtils.GetProcessEnvironmentVariable(KnownSessionVars.OnePasswordOrganization),
-                environment: EnvironmentUtils.GetProcessEnvironmentVariable(KnownSessionVars.OnePasswordEnvironment),
-                sessionToken: EnvironmentUtils.GetProcessEnvironmentVariable(KnownSessionVars.OnePasswordSessionToken),
-                vault: EnvironmentUtils.GetProcessEnvironmentVariable(KnownSessionVars.OnePasswordVault)
+                organization: _envAccessor.GetProcessEnvironmentVariable(KnownSessionVars.OnePasswordOrganization),
+                environment: _envAccessor.GetProcessEnvironmentVariable(KnownSessionVars.OnePasswordEnvironment),
+                sessionToken: _envAccessor.GetProcessEnvironmentVariable(KnownSessionVars.OnePasswordSessionToken),
+                vault: _envAccessor.GetProcessEnvironmentVariable(KnownSessionVars.OnePasswordVault)
             ));
         }
 
         public Task Update(AppyOnePasswordSession session)
         {
-            if (!IsRunningOnWindows)
+            if (!_platformInfo.IsRunningOnWindows())
             {
                 throw new PlatformNotSupportedException("Updating a session using environment variables is not supported on your OS.");
             }
@@ -43,10 +51,10 @@ namespace Appy.Infrastructure.OnePassword.Storage
             if (string.IsNullOrWhiteSpace(session.SessionToken)) throw new ArgumentException("1Password SessionToken must be specified", nameof(AppyOnePasswordSession.SessionToken));
             if (string.IsNullOrWhiteSpace(session.Vault)) throw new ArgumentException("1Password Vault must be specified", nameof(session.Vault));
 
-            EnvironmentUtils.SetUserEnvironmentVariable(KnownSessionVars.OnePasswordOrganization, session.Organization);
-            EnvironmentUtils.SetUserEnvironmentVariable(KnownSessionVars.OnePasswordEnvironment, session.Environment);
-            EnvironmentUtils.SetUserEnvironmentVariable(KnownSessionVars.OnePasswordVault, session.Vault);
-            EnvironmentUtils.SetUserEnvironmentVariable(KnownSessionVars.OnePasswordSessionToken, session.SessionToken);
+            _envAccessor.SetUserEnvironmentVariable(KnownSessionVars.OnePasswordOrganization, session.Organization);
+            _envAccessor.SetUserEnvironmentVariable(KnownSessionVars.OnePasswordEnvironment, session.Environment);
+            _envAccessor.SetUserEnvironmentVariable(KnownSessionVars.OnePasswordVault, session.Vault);
+            _envAccessor.SetUserEnvironmentVariable(KnownSessionVars.OnePasswordSessionToken, session.SessionToken);
 
             return Task.CompletedTask;
         }

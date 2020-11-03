@@ -29,13 +29,8 @@ namespace Appy.Configuration.OnePassword
             Tool = tool ?? throw new ArgumentNullException(nameof(tool));
 
             if (string.IsNullOrWhiteSpace(appName)) throw new ArgumentException("1Password App name must be specified", nameof(appName));
-            if (string.IsNullOrWhiteSpace(organization)) throw new ArgumentException("1Password Organization must be specified", nameof(organization));
-            if (string.IsNullOrWhiteSpace(vault)) throw new ArgumentException("1Password Vault must be specified", nameof(vault));
-            if (string.IsNullOrWhiteSpace(environment)) throw new ArgumentException("1Password Environment must be specified", nameof(environment));
-            if (string.IsNullOrWhiteSpace(sessionToken)) throw new ArgumentException("1Password SessionToken must be specified", nameof(sessionToken));
 
             AppName = appName;
-            AppSettingsName = $"{appName}.AppSettings";
             Organization = organization;
             Vault = vault;
             Environment = environment;
@@ -50,12 +45,6 @@ namespace Appy.Configuration.OnePassword
         /// and as a secure note on the organization vault.
         /// </summary>
         public string AppName { get; }
-
-        /// <summary>
-        /// Gets App settings name already pre-configured on 1Password like "AppName.AppSettings"
-        /// and as a secure note on the organization vault.
-        /// </summary>
-        public string AppSettingsName { get; }
 
         /// <summary>
         /// 1Password organization name (eg: https://yourorg.1password.com/)

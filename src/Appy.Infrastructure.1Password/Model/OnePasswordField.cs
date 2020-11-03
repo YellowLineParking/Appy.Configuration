@@ -2,9 +2,12 @@ namespace Appy.Infrastructure.OnePassword.Model
 {
     public class OnePasswordField
     {
-        public string? Name => T;
-        public string? Value => V;
-        public string? T { get; set; }
-        public string? V { get; set; }
+        public string? Name { get; set; }
+        public string? Value { get; set; }
+
+        public static OnePasswordField New(string name, string value)
+        {
+            return new OnePasswordField { Name = name, Value = value };
+        }
     }
 }

@@ -6,6 +6,18 @@ namespace Appy.Infrastructure.OnePassword.Model
     {
         public string? Title { get; set; }
 
-        public IList<OnePasswordField>? Fields { get; set; }
+        public IReadOnlyCollection<OnePasswordInternalField>? Fields { get; set; }
+
+        public OnePasswordSection WithTitle(string title)
+        {
+            Title = title;
+            return this;
+        }
+
+        public OnePasswordSection WithFields(IReadOnlyCollection<OnePasswordInternalField> fields)
+        {
+            Fields = fields;
+            return this;
+        }
     }
 }

@@ -1,30 +1,31 @@
 using System;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Appy.Configuration.Common;
 using Appy.Infrastructure.OnePassword.Model;
 
 namespace Appy.Infrastructure.OnePassword.Storage
 {
     public class OnePasswordSessionStorageSelector: IOnePasswordSessionStorage
     {
-        private readonly IOnePasswordSessionStorage _environmentSessionStorage;
-        private readonly IOnePasswordSessionStorage _fileSessionStorage;
+        readonly IPlatformInformation _platformInfo;
+        readonly IOnePasswordSessionStorage _environmentSessionStorage;
+        readonly IOnePasswordSessionStorage _fileSessionStorage;
 
         public OnePasswordSessionStorageSelector(
+            IPlatformInformation platformInfo,
             IOnePasswordSessionStorage environmentSessionStorage,
             IOnePasswordSessionStorage fileSessionStorage)
         {
+            _platformInfo = platformInfo ?? throw new ArgumentNullException(nameof(platformInfo));
             _environmentSessionStorage = environmentSessionStorage ?? throw new ArgumentNullException(nameof(environmentSessionStorage));
             _fileSessionStorage = fileSessionStorage ?? throw new ArgumentNullException(nameof(fileSessionStorage));
         }
-
-        static bool IsRunningOnWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
         public async Task<AppyOnePasswordSession> GetCurrent()
         {
             var session = await _environmentSessionStorage.GetCurrent();
 
-            if (!IsRunningOnWindows && string.IsNullOrWhiteSpace(session.Organization))
+            if (!_platformInfo.IsRunningOnWindows() && string.IsNullOrWhiteSpace(session.Organization))
             {
                 session = await _fileSessionStorage.GetCurrent();
             }
@@ -34,7 +35,7 @@ namespace Appy.Infrastructure.OnePassword.Storage
 
         public Task Update(AppyOnePasswordSession session)
         {
-            if (IsRunningOnWindows)
+            if (_platformInfo.IsRunningOnWindows())
             {
                 return _environmentSessionStorage.Update(session);
             }

@@ -17,9 +17,28 @@ namespace Appy.Configuration.IO
 
         public void Clear() => _tokens.Clear();
 
-        public void Append(string argument) => _tokens.Add(argument);
+        public ProcessArgumentBuilder Append(string argument)
+        {
+            _tokens.Add(argument);
+            return this;
+        }
 
-        public void Prepend(string argument) => _tokens.Insert(0, argument);
+        public ProcessArgumentBuilder AppendIf(bool condition, string argument)
+        {
+            if (!condition)
+            {
+                return this;
+            }
+            
+            _tokens.Add(argument);
+            return this;
+        }
+
+        public ProcessArgumentBuilder Prepend(string argument)
+        {
+            _tokens.Insert(0, argument);
+            return this;
+        }
 
         public string Render() => string.Join(" ", _tokens.Select(t => t));
 

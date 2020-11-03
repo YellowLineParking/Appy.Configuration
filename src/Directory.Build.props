@@ -44,13 +44,15 @@
 
   <PropertyGroup  Label="Package Versions">
     <MicrosoftWin32RegistryPackageVersion>4.7.0</MicrosoftWin32RegistryPackageVersion>
+    <FlurlPackageVersion>3.0.0</FlurlPackageVersion>
     <NewtonsoftJsonPackageVersion>12.0.3</NewtonsoftJsonPackageVersion>
     <MedallionShellPackageVersion>1.6.1</MedallionShellPackageVersion>
-    <McMasterExtensionsCommandLineUtilsPackageVersion>3.0.0</McMasterExtensionsCommandLineUtilsPackageVersion>
+    <McMasterExtensionsCommandLineUtilsPackageVersion>3.1.0-rc.371</McMasterExtensionsCommandLineUtilsPackageVersion>
     <SpectreConsolePackageVersion>0.24.1-preview.0.3</SpectreConsolePackageVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Test Package Versions">
+    <MartinCostelloLoggingXUnitPackageVersion>0.1.0</MartinCostelloLoggingXUnitPackageVersion>
     <MicrosoftNETTestSdkPackageVersion>16.7.0</MicrosoftNETTestSdkPackageVersion>
     <FluentAssertionsPackageVersion>5.10.3</FluentAssertionsPackageVersion>
     <MoqPackageVersion>4.14.6</MoqPackageVersion>

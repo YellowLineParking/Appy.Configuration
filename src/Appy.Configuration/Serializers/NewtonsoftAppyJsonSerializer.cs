@@ -1,5 +1,6 @@
 using System;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Appy.Configuration.Serializers
 {
@@ -8,7 +9,14 @@ namespace Appy.Configuration.Serializers
         readonly JsonSerializerSettings _defaultSettings;
 
         public NewtonsoftAppyJsonSerializer()
-            : this(new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore })
+            : this(new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                ContractResolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new CamelCaseNamingStrategy()
+                }
+            })
         { }
 
         public NewtonsoftAppyJsonSerializer(JsonSerializerSettings settings)

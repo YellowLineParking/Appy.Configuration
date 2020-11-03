@@ -30,7 +30,7 @@ namespace Appy.Sample.OnePassword.Api
                     {
                         // Options to load 1Password settings
 
-                        // 1.1  Load 1Password settings for the environment with the values manually setted for this session:
+                        // 1.1  Load 1Password settings for the environment with the values manually set for this session:
                         //builder.Add1Password(
                         //    appName: "Appy.Sample.1Password.Api",
                         //    organization: "appyway",

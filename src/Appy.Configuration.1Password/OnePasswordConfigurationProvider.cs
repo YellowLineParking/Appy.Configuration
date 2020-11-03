@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Appy.Infrastructure.OnePassword.Queries;
-using Appy.Infrastructure.OnePassword.Tooling;
 using Microsoft.Extensions.Configuration;
 
 namespace Appy.Configuration.OnePassword
@@ -27,10 +26,12 @@ namespace Appy.Configuration.OnePassword
 
         async Task LoadAsync()
         {
+            var appSettingsName = $"{_source.AppName}.AppSettings";
+
             var query = new GetOnePasswordNoteQuery
             {
                 Organization = _source.Organization,
-                Item = _source.AppSettingsName,
+                Item = appSettingsName,
                 Vault = _source.Vault,
                 Environment = _source.Environment,
                 SessionToken = _source.SessionToken
@@ -40,24 +41,23 @@ namespace Appy.Configuration.OnePassword
 
             var data = new Dictionary<string, string>();
 
-            var sectionFields = result.EnvironmentSection?.Fields;
-            if (sectionFields == null)
+            if (result?.Fields == null)
             {
-                throw new OnePasswordConfigurationException($"1Password {query.Environment} environment section settings cannot be null");
+                throw new OnePasswordConfigurationException($"1Password {query.Environment} environment section fields cannot be empty");
             }
 
-            foreach (var sectionField in sectionFields)
+            foreach (var field in result.Fields)
             {
-                if (string.IsNullOrWhiteSpace(sectionField.Name))
+                if (string.IsNullOrWhiteSpace(field.Name))
                 {
                     throw new OnePasswordConfigurationException($"1Password {query.Environment} environment section fields name cannot be empty");
                 }
-                if (string.IsNullOrWhiteSpace(sectionField.Value))
+                if (string.IsNullOrWhiteSpace(field.Value))
                 {
-                    throw new OnePasswordConfigurationException($"1Password {query.Environment} environment section field '{sectionField.Name}' value cannot be empty");
+                    throw new OnePasswordConfigurationException($"1Password {query.Environment} environment section field '{field.Name}' value cannot be empty");
                 }
 
-                data[sectionField.Name!] = sectionField.Value!;
+                data[field.Name!] = field.Value!;
             }
 
             Data = data;

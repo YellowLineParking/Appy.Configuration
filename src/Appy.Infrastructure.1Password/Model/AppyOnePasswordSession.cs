@@ -1,12 +1,9 @@
-using System;
-
 namespace Appy.Infrastructure.OnePassword.Model
 {
     public class AppyOnePasswordSession
     {
         private AppyOnePasswordSession()
-        {
-        }
+        { }
 
         private AppyOnePasswordSession(
             string? organization,
