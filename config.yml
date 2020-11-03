@@ -8,5 +8,9 @@ Appy.Configuration.1Password:
   Type: Package
 Appy.Tool.1Password:
   Type: Package
-Appy.Configuration.Tests:
+Appy.Configuration.WinRegistry.Tests:
+  Type: XUnit
+Appy.Infrastructure.1Password.Tests:
+  Type: XUnit
+Appy.Configuration.1Password.Tests:
   Type: XUnit

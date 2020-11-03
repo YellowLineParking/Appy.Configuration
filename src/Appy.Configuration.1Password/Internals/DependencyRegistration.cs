@@ -3,17 +3,16 @@ using Appy.Configuration.Logging;
 using Appy.Configuration.Serializers;
 using Appy.Infrastructure.OnePassword.Storage;
 using Appy.Infrastructure.OnePassword.Tooling;
-using Appy.Tool.OnePassword.CLI;
-using Appy.Tool.OnePassword.Logging;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Appy.Tool.OnePassword.Composition
+namespace Appy.Configuration.OnePassword.Internals
 {
-    public static class DependencyRegistration
+    internal static class DependencyRegistration
     {
-        public static IServiceCollection AddToolDependencies(this IServiceCollection services)
+        internal static IServiceCollection AddConfigurationDependencies(this IServiceCollection services)
         {
             services
+                .AddSingleton<ILogger, EmptyLogger>()
                 .AddSingleton<IAppyJsonSerializer, NewtonsoftAppyJsonSerializer>()
                 .AddSingleton<IProcessRunner, DefaultProcessRunner>()
                 .AddSingleton<IOnePasswordTool, OnePasswordTool>()
@@ -21,10 +20,7 @@ namespace Appy.Tool.OnePassword.Composition
                 .AddSingleton<OnePasswordFileSessionStorage>()
                 .AddSingleton<IOnePasswordSessionStorage>(sp => new OnePasswordSessionStorageSelector(
                     sp.GetService<OnePasswordEnvironmentSessionStorage>(),
-                    sp.GetService<OnePasswordFileSessionStorage>()))
-                .AddSingleton<IAppyOnePasswordToolCLI, AppyOnePasswordToolCLI>()
-                .AddSingleton<ILogger, ConsoleLogger>()
-                .AddSingleton<IConsoleVisualzer, ConsoleVisualizer>();
+                    sp.GetService<OnePasswordFileSessionStorage>()));
 
             return services;
         }

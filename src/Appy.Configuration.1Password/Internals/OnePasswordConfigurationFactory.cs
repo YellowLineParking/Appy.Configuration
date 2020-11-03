@@ -1,32 +1,20 @@
-using Appy.Configuration.IO;
-using Appy.Configuration.Logging;
-using Appy.Configuration.Serializers;
-using Appy.Infrastructure.OnePassword.Tooling;
+using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Appy.Configuration.OnePassword.Internals
 {
     internal static class OnePasswordConfigurationFactory
     {
-        internal static ILogger EmptyLogger() => new EmptyLogger();
+        internal static Action<IServiceCollection> ServiceInterceptor;
 
-        internal static IAppyJsonSerializer CreateDefaultSerializer() =>
-            new NewtonsoftAppyJsonSerializer();
+        internal static IServiceProvider BuildServiceProvider()
+        {
+            var serviceCollection = new ServiceCollection()
+                .AddConfigurationDependencies();
+            
+            ServiceInterceptor?.Invoke(serviceCollection);
 
-        internal static IProcessRunner CreateDefaultProcessRunner() =>
-            new DefaultProcessRunner();
-
-        internal static IOnePasswordTool CreateDefaultOnePasswordTool(
-            IAppyJsonSerializer jsonSerializer,
-            IProcessRunner processRunner,
-            ILogger logger) =>
-            new OnePasswordTool(
-                logger,
-                jsonSerializer,
-                processRunner);
-
-        internal static IOnePasswordSessionStorage CreateDefaultSessionStorage() =>
-            new OnePasswordSessionStorageSelector(
-                new OnePasswordEnvironmentSessionStorage(),
-                new OnePasswordFileSessionStorage());
+            return serviceCollection.BuildServiceProvider();
+        }
     }
 }

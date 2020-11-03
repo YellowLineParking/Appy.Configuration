@@ -1,14 +1,14 @@
 namespace Appy.Infrastructure.OnePassword.Commands
 {
-    public class SigninOnePasswordResult
+    public class SignInOnePasswordResult
     {
-        protected SigninOnePasswordResult(string sessionToken)
+        protected SignInOnePasswordResult(string sessionToken)
         {
             SessionToken = sessionToken;
         }
 
-        public static SigninOnePasswordResult Create(string sessionToken) =>
-            new SigninOnePasswordResult(sessionToken);
+        public static SignInOnePasswordResult Create(string sessionToken) =>
+            new SignInOnePasswordResult(sessionToken);
 
         public bool Success => !string.IsNullOrWhiteSpace(SessionToken);
         public string SessionToken { get; }

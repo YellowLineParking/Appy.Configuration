@@ -1,9 +1,8 @@
-using Appy.Configuration.WinRegistry;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Xunit;
 
-namespace Appy.Configuration.Tests.WinRegistry
+namespace Appy.Configuration.WinRegistry.Tests
 {
     public class WinRegistryConfigurationTests
     {

@@ -10,6 +10,7 @@ using Appy.Configuration.Serializers;
 using Appy.Infrastructure.OnePassword.Commands;
 using Appy.Infrastructure.OnePassword.Model;
 using Appy.Infrastructure.OnePassword.Queries;
+using Appy.Infrastructure.OnePassword.Validation;
 
 namespace Appy.Infrastructure.OnePassword.Tooling
 {
@@ -26,9 +27,9 @@ namespace Appy.Infrastructure.OnePassword.Tooling
             IAppyJsonSerializer jsonSerializer,
             IProcessRunner processRunner)
         {
-            _logger = logger;
-            _jsonSerializer = jsonSerializer;
-            _processRunner = processRunner;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _jsonSerializer = jsonSerializer ?? throw new ArgumentNullException(nameof(jsonSerializer));
+            _processRunner = processRunner ?? throw new ArgumentNullException(nameof(processRunner));
         }
 
         static Task<ProcessResult> GetItem(IProcessRunner processRunner, string organization, string vault, string item, string sessionToken)
@@ -124,29 +125,21 @@ namespace Appy.Infrastructure.OnePassword.Tooling
                 throw new OnePasswordToolException($"1Password internal CLI failed with exit code {processResult.ExitCode}: {processResult.StandardError}");
             }
 
-            OnePasswordSection? environmentSection;
-
             try
             {
                 var note = _jsonSerializer.Deserialize<OnePasswordNote>(processResult.StandardOutput);
-                environmentSection = note?.GetSectionByEnvironment(query.Environment);
+
+                var environmentSection = note?.GetSectionByEnvironment(query.Environment);
+
+                return new GetOnePasswordNoteQueryResult
+                {
+                    EnvironmentSection = environmentSection
+                };
             }
             catch (Exception ex)
             {
                 throw new OnePasswordToolException("1Password Tool failed deserialization", ex);
             }
-
-            if (environmentSection == null || environmentSection.Fields?.Count == 0)
-            {
-                throw new OnePasswordToolException($"1Password ${query.Environment} Environment Section does not contain a valid configuration");
-            }
-
-            var queryResult = new GetOnePasswordNoteQueryResult
-            {
-                EnvironmentSection = environmentSection
-            };
-
-            return queryResult;
         }
 
         ///<inheritdoc cref="IOnePasswordTool"/>
@@ -162,32 +155,28 @@ namespace Appy.Infrastructure.OnePassword.Tooling
                 throw new OnePasswordToolException($"1Password internal CLI failed with exit code {processResult.ExitCode}: {processResult.StandardError}");
             }
 
-            IList<OnePasswordVault> vaults;
-
             try
             {
-                vaults = _jsonSerializer.Deserialize<IList<OnePasswordVault>>(processResult.StandardOutput);
+                var vaults = _jsonSerializer.Deserialize<IList<OnePasswordVault>>(processResult.StandardOutput);
+
+                return new GetOnePasswordVaultsQueryResult
+                {
+                    Vaults = vaults
+                };
             }
             catch (Exception ex)
             {
                 throw new OnePasswordToolException("1Password Tool failed deserialization", ex);
             }
-
-            var queryResult = new GetOnePasswordVaultsQueryResult
-            {
-                Vaults = vaults
-            };
-
-            return queryResult;
         }
 
         ///<inheritdoc cref="IOnePasswordTool"/>
-        public async Task<SigninOnePasswordResult> Execute(SignInOnePasswordCommand command, CancellationToken cancellationToken = default)
+        public async Task<SignInOnePasswordResult> Execute(SignInOnePasswordCommand command, CancellationToken cancellationToken = default)
         {
             var validationResult = command.Validate();
             if (!validationResult.IsValid)
             {
-                return SigninOnePasswordResult.Create(string.Empty);
+                return SignInOnePasswordResult.Create(string.Empty);
             }
 
             var processResult = await Signin(_processRunner, _logger, command);
@@ -199,7 +188,7 @@ namespace Appy.Infrastructure.OnePassword.Tooling
 
             var sessionToken = processResult.StandardOutput.TrimEnd('\n');
 
-            return SigninOnePasswordResult.Create(sessionToken);
+            return SignInOnePasswordResult.Create(sessionToken);
         }
     }
 }
