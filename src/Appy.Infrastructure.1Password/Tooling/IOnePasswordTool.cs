@@ -32,7 +32,7 @@ namespace Appy.Infrastructure.OnePassword.Tooling
         /// <param name="command">The query to get the 1Password note environment section settings</param>
         /// <param name="cancellationToken">The cancellationToken</param>
         /// <returns>A 1Password session token</returns>
-        Task<SigninOnePasswordResult> Execute(SignInOnePasswordCommand command, CancellationToken cancellationToken = default);
+        Task<SignInOnePasswordResult> Execute(SignInOnePasswordCommand command, CancellationToken cancellationToken = default);
 
     }
 }

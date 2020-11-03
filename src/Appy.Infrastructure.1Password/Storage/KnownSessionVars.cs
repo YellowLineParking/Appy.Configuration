@@ -1,4 +1,4 @@
-namespace Appy.Infrastructure.OnePassword.Tooling
+namespace Appy.Infrastructure.OnePassword.Storage
 {
     public static class KnownSessionVars
     {

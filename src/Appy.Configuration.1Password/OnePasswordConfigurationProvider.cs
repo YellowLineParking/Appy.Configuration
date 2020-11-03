@@ -43,18 +43,18 @@ namespace Appy.Configuration.OnePassword
             var sectionFields = result.EnvironmentSection?.Fields;
             if (sectionFields == null)
             {
-                throw new OnePasswordToolException($"1Password {query.Environment} environment section settings cannot be null");
+                throw new OnePasswordConfigurationException($"1Password {query.Environment} environment section settings cannot be null");
             }
 
             foreach (var sectionField in sectionFields)
             {
                 if (string.IsNullOrWhiteSpace(sectionField.Name))
                 {
-                    throw new OnePasswordToolException($"1Password {query.Environment} environment section fields name cannot be empty");
+                    throw new OnePasswordConfigurationException($"1Password {query.Environment} environment section fields name cannot be empty");
                 }
                 if (string.IsNullOrWhiteSpace(sectionField.Value))
                 {
-                    throw new OnePasswordToolException($"1Password {query.Environment} environment section field '{sectionField.Name}' value cannot be empty");
+                    throw new OnePasswordConfigurationException($"1Password {query.Environment} environment section field '{sectionField.Name}' value cannot be empty");
                 }
 
                 data[sectionField.Name!] = sectionField.Value!;

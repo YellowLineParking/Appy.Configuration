@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Appy.Configuration.Common;
 using Appy.Infrastructure.OnePassword.Model;
 
-namespace Appy.Infrastructure.OnePassword.Tooling
+namespace Appy.Infrastructure.OnePassword.Storage
 {
     public class OnePasswordEnvironmentSessionStorage: IOnePasswordSessionStorage
     {

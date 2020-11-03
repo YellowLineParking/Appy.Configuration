@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Appy.Infrastructure.OnePassword.Model;
 
-namespace Appy.Infrastructure.OnePassword.Tooling
+namespace Appy.Infrastructure.OnePassword.Storage
 {
     public class OnePasswordSessionStorageSelector: IOnePasswordSessionStorage
     {

@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Appy.Infrastructure.OnePassword.Model;
-using static Appy.Infrastructure.OnePassword.Tooling.KnownSessionVars;
+using static Appy.Infrastructure.OnePassword.Storage.KnownSessionVars;
 
-namespace Appy.Infrastructure.OnePassword.Tooling
+namespace Appy.Infrastructure.OnePassword.Storage
 {
     public class OnePasswordFileSessionStorage : IOnePasswordSessionStorage
     {

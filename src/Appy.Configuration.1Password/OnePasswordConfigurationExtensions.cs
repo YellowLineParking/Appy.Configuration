@@ -1,7 +1,9 @@
 using System;
 using Appy.Configuration.OnePassword.Internals;
+using Appy.Infrastructure.OnePassword.Storage;
+using Appy.Infrastructure.OnePassword.Tooling;
 using Microsoft.Extensions.Configuration;
-using static Appy.Infrastructure.OnePassword.Tooling.KnownSessionVars;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Appy.Configuration.OnePassword
 {
@@ -34,10 +36,9 @@ namespace Appy.Configuration.OnePassword
             string sessionToken,
             Action<OnePasswordConfigurationSource>? configureSource = null)
         {
-            var jsonSerializer = OnePasswordConfigurationFactory.CreateDefaultSerializer();
-            var processRunner = OnePasswordConfigurationFactory.CreateDefaultProcessRunner();
-            var logger = OnePasswordConfigurationFactory.EmptyLogger();
-            var tool = OnePasswordConfigurationFactory.CreateDefaultOnePasswordTool(jsonSerializer, processRunner, logger);
+            var serviceProvider = OnePasswordConfigurationFactory.BuildServiceProvider();
+
+            var tool = serviceProvider.GetService<IOnePasswordTool>();
 
             var source = new OnePasswordConfigurationSource(
                 tool,
@@ -72,14 +73,11 @@ namespace Appy.Configuration.OnePassword
             string appName,
             Action<OnePasswordConfigurationSource>? configureSource = null)
         {
-            var sessionStorage = OnePasswordConfigurationFactory.CreateDefaultSessionStorage();
+            var serviceProvider = OnePasswordConfigurationFactory.BuildServiceProvider();
+
+            var sessionStorage = serviceProvider.GetService<IOnePasswordSessionStorage>();
 
             var session = sessionStorage.GetCurrent().GetAwaiter().GetResult();
-
-            if (string.IsNullOrWhiteSpace(session.Organization)) throw new ArgumentException($"1Password Organization should be in the environment variables like '${OnePasswordOrganization}'");
-            if (string.IsNullOrWhiteSpace(session.Environment)) throw new ArgumentException($"1Password Environment should be in the environment variables like '${OnePasswordEnvironment}'");
-            if (string.IsNullOrWhiteSpace(session.Vault)) throw new ArgumentException($"1Password Vault should be in the environment variables like '${OnePasswordVault}'");
-            if (string.IsNullOrWhiteSpace(session.SessionToken)) throw new ArgumentException($"1Password Session Token should be in the environment variables like '${OnePasswordSessionToken}'");
 
             return builder.Add1Password(
                 appName: appName,

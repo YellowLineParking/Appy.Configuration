@@ -6,6 +6,7 @@ using Appy.Configuration.Logging;
 using Appy.Infrastructure.OnePassword.Commands;
 using Appy.Infrastructure.OnePassword.Model;
 using Appy.Infrastructure.OnePassword.Queries;
+using Appy.Infrastructure.OnePassword.Storage;
 using Appy.Infrastructure.OnePassword.Tooling;
 using Appy.Tool.OnePassword.Logging;
 using McMaster.Extensions.CommandLineUtils;
