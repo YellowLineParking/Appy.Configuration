@@ -10,9 +10,9 @@ Configuration providers for NETCore 2.2, 3.0 and 3.1+.
 
 | Package | Latest Stable |
 | --- | --- |
-| [Appy.Configuration.WinRegistry](https://www.nuget.org/packages/Appy.Configuration.WinRegistry) | [![Nuget Package](https://img.shields.io/badge/nuget-0.4.0-blue.svg)](https://www.nuget.org/packages/Appy.Configuration.WinRegistry) |
-| [Appy.Configuration.1Password](https://www.nuget.org/packages/Appy.Configuration.1Password) | [![Nuget Package](https://img.shields.io/badge/nuget-0.4.0-blue.svg)](https://www.nuget.org/packages/Appy.Configuration.1Password) |
-| [appy-op](https://www.nuget.org/packages/appy-op) | [![Nuget Package](https://img.shields.io/badge/nuget-0.4.0-blue.svg)](https://www.nuget.org/packages/appy-op) |
+| [Appy.Configuration.WinRegistry](https://www.nuget.org/packages/Appy.Configuration.WinRegistry) | [![Nuget Package](https://img.shields.io/badge/nuget-0.5.0-blue.svg)](https://www.nuget.org/packages/Appy.Configuration.WinRegistry) |
+| [Appy.Configuration.1Password](https://www.nuget.org/packages/Appy.Configuration.1Password) | [![Nuget Package](https://img.shields.io/badge/nuget-0.5.0-blue.svg)](https://www.nuget.org/packages/Appy.Configuration.1Password) |
+| [appy-op](https://www.nuget.org/packages/appy-op) | [![Nuget Package](https://img.shields.io/badge/nuget-0.5.0-blue.svg)](https://www.nuget.org/packages/appy-op) |
 
 ## Table of Contents
 
@@ -46,7 +46,7 @@ PM> Install-Package Appy.Configuration.WinRegistry
 When you install the package, it should be added to your _csproj_ file. Alternatively, you can add it directly by adding:
 
 ```xml
-<PackageReference Include="Appy.Configuration.WinRegistry" Version="0.4.0" />
+<PackageReference Include="Appy.Configuration.WinRegistry" Version="0.5.0" />
 ```
 
 Now let's imagine we have a configuration file like the following appSettings.json:
@@ -213,7 +213,7 @@ PM> Install-Package Appy.Configuration.1Password
 When you install the package, it should be added to your _csproj_ file. Alternatively, you can add it directly by adding:
 
 ```xml
-<PackageReference Include="Appy.Configuration.1Password" Version="0.4.0" />
+<PackageReference Include="Appy.Configuration.1Password" Version="0.5.0" />
 ```
 
 Let's imagine we have a configuration file like the following appsettings.json file:

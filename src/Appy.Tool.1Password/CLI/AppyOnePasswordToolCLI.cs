@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Appy.Configuration.Logging;
+using Appy.Configuration.Utilities;
 using Appy.Infrastructure.OnePassword.Commands;
 using Appy.Infrastructure.OnePassword.Model;
 using Appy.Infrastructure.OnePassword.Queries;
@@ -20,7 +21,7 @@ namespace Appy.Tool.OnePassword.CLI
         readonly IOnePasswordSessionStorage _sessionStorage;
         readonly IOnePasswordTool _onePasswordTool;
         const int AutoRenewDelayInMins = 29;
-        static string GetAssemblyVersion() => typeof(AppyOnePasswordToolCLI).Assembly.GetName().Version.ToString();
+        static string GetVersion() => VersionUtilities.GetVersion(typeof(AppyOnePasswordToolCLI).Assembly);
 
         public AppyOnePasswordToolCLI(
             ILogger logger,
@@ -100,7 +101,7 @@ namespace Appy.Tool.OnePassword.CLI
             };
 
             app.HelpOption("-h|--help");
-            app.VersionOption("-v|--version", GetAssemblyVersion());
+            app.VersionOption("-v|--version", GetVersion());
 
             var signInOption = app.Option("-s|--signin", "Signin to 1Password account (eg: --signin <organization> <email_address> <secret_key>)", CommandOptionType.SingleOrNoValue);
             var vaultOption = app.Option("-vt|--vault", "1Password vault to use. If not specified, it will use the last known.", CommandOptionType.SingleValue);
