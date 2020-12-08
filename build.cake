@@ -65,7 +65,10 @@ Task("Test")
             NoRestore = true,
             NoBuild = true,
             TestAdapterPath = ".",
-            Logger = $"xunit;LogFilePath={MakeAbsolute(artifactsPath).FullPath}/xunit-{projectConfig.Name}.xml",
+            Loggers = new string[] {
+                // $"xunit;LogFilePath={MakeAbsolute(artifactsPath).FullPath}/xunit-{projectConfig.Name}.xml",
+                "GitHubActions;report-warnings=false"
+            },
             Verbosity = DotNetCoreVerbosity.Quiet
         });
     }

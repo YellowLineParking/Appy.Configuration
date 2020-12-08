@@ -24,15 +24,8 @@ namespace Appy.Tool.OnePassword.Logging
                 .AsciiBorder()
                 .HideHeaders();
 
-            var footerTable = new Table()
-                .AddColumn(new TableColumn(string.Empty))
-                .AddEmptyRow()
-                .NoBorder()
-                .HideHeaders();
-
             AnsiConsole.Render(headerTable);
             AnsiConsole.Render(sessionTable);
-            AnsiConsole.Render(footerTable);
         }
     }
 }

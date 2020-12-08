@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 
 namespace Appy.Configuration.Utilities
@@ -15,7 +16,7 @@ namespace Appy.Configuration.Utilities
             try
             {
                 var info = FileVersionInfo.GetVersionInfo(assembly.Location);
-                return info.ProductVersion ?? "?";
+                return info.ProductVersion?.Split('+').FirstOrDefault() ?? "?";
             }
             catch
             {

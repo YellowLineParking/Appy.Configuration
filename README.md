@@ -4,7 +4,7 @@
 
 ## What is Appy.Configuration?
 
-Configuration providers for NETCore 2.2, 3.0 and 3.1+.
+Configuration providers for NETCore 2.2, 3.0, 3.1 and NET 5.0.
 
 ## Configuration Providers
 
@@ -222,7 +222,7 @@ appy-op --signin yourorg your_name@yourorg.com secretkey --vault Development -en
 Enter the password for your_name@yourorg.com at yourorg.1password.com:
 ...
 
-Updating user environment variables.
+Updating 1Password session information.
 
 Appy 1Password session started:
 +------------------------------------------------------------+
@@ -268,7 +268,7 @@ appy-op -s -a
 In search of supporting projects that want to run or debug their projects inside Docker and at the same time consume the configuration from 1Password, a simple Nano Api integrated directly in the tool was added. This eliminates the need to have any reference to the 1Password cli in your project image.
 
 ```console
-appy-op -s -api 5500
+appy-op -s -a -api 5500
 ```
 
 When executing or debugging your dotnet project in a Docker container, it will be necessary to specify the url of the tool's Api through an environment variable:

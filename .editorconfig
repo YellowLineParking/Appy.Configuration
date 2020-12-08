@@ -176,7 +176,6 @@ csharp_preserve_single_line_statements = true
 
 # warning RS0037: PublicAPI.txt is missing '#nullable enable'
 dotnet_diagnostic.RS0037.severity = none
-
 dotnet_diagnostic.CS8602.severity = none
-
+dotnet_diagnostic.CS8604.severity = none
 dotnet_diagnostic.CS8618.severity = none

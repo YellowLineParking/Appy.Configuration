@@ -21,7 +21,7 @@ jobs:
   #   - name: Setup dotnet
   #     uses: actions/setup-dotnet@v1
   #     with:
-  #       dotnet-version: '3.1.402' # SDK Version to use.
+  #       dotnet-version: '5.0.100' # SDK Version to use.
 
   #   - name: Build
   #     shell: bash
@@ -55,10 +55,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup dotnet
+      - name: Setup .NETCore 3.1.402
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 3.1.402
+
+      - name: Setup .NET 5.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.100
 
       - name: Integration Tests
         shell: bash

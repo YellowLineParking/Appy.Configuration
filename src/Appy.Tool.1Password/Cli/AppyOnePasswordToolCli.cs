@@ -109,7 +109,7 @@ namespace Appy.Tool.OnePassword.Cli
         public async Task<int> ExecuteAsync(params string[] args)
         {
             var adaptedArgs = args.EscapeArgs();
-            
+
             var app = _commandLineAppFactory.Create(
                 name: "appy-op",
                 fullName: "Appy 1Password Session Tool"
@@ -118,11 +118,11 @@ namespace Appy.Tool.OnePassword.Cli
             app.HelpOption("-h|--help");
             app.VersionOption("-v|--version", GetVersion());
 
-            var signInOption = app.Option("-s|--signin", "Signin to 1Password account (eg: --signin <organization> <email_address> <secret_key>)", CommandOptionType.SingleOrNoValue);
+            var signInOption = app.Option("-s|--signin", "Signin to 1Password account (eg: --signin <organization> <email_address> <secret_key>).", CommandOptionType.SingleOrNoValue);
             var vaultOption = app.Option("-vt|--vault", "1Password vault to use. If not specified, it will use the last known.", CommandOptionType.SingleValue);
             var envOption = app.Option("-env|--environment", "1Password note section environment. If not specified, it will use the last known.", CommandOptionType.SingleValue);
             var autoRenew = app.Option("-a|--auto-renew", "Automatically renew 1Password session activity before the 30 min expire.", CommandOptionType.NoValue);
-            var apiOption = app.Option<int?>("-api|--local-api", "Launch a local Http API (default port 5500) to get configurations for session (eg: -api 6000)", CommandOptionType.SingleOrNoValue);
+            var apiOption = app.Option<int?>("-api|--local-api", "Launch a local Http API (default port 5500) to get configurations for session (eg: -api 6000).", CommandOptionType.SingleOrNoValue);
 
             app.OnExecuteAsync(async cancellationToken =>
             {
@@ -146,12 +146,13 @@ namespace Appy.Tool.OnePassword.Cli
 
                 _consoleVisualizer.Render(session);
 
+                _logger.LogInformation(string.Empty);
+                _logger.LogInformation("You can now go to your project and start your debug session.");
+
                 if (!autoRenew.HasValue())
                 {
                     _logger.LogInformation("Session tokens expire after 30 minutes of inactivity, after which you’ll need to sign in again.");
                 }
-
-                _logger.LogInformation("You can now go to your project and start your debug session.");
 
                 if (apiOption.HasValue())
                 {
@@ -161,7 +162,6 @@ namespace Appy.Tool.OnePassword.Cli
                         Port = apiOption.ParsedValue ?? 5500
                     };
 
-                    _logger.LogInformation(string.Empty);
                     _logger.LogInformation($"Appy 1Password session API listening on port: {apiSettings.Port}");
 
                     _apiRunner.Start(apiSettings);
@@ -171,8 +171,6 @@ namespace Appy.Tool.OnePassword.Cli
                 {
                     return 0;
                 }
-
-                _logger.LogInformation(string.Empty);
 
                 var foreverCancellationTokenSource = new CancellationTokenSource();
 
