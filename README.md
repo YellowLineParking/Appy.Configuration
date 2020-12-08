@@ -4,7 +4,7 @@
 
 ## What is Appy.Configuration?
 
-Configuration providers for NETCore 2.2, 3.0 and 3.1+.
+Configuration providers for NETCore 2.2, 3.0, 3.1 and NET 5.0.
 
 ## Configuration Providers
 

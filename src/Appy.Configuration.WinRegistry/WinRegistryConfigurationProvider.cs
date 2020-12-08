@@ -21,6 +21,8 @@ namespace Appy.Configuration.WinRegistry
             _source = source ?? throw new ArgumentNullException(nameof(source));
         }
 
+#pragma warning disable CA1416
+
         /// <inheritdoc />
         public override void Load()
         {
@@ -58,6 +60,7 @@ namespace Appy.Configuration.WinRegistry
             _source.DataAdapter?.Invoke(data);
 
             Data = data;
+
         }
 
         static void ReadSection(RegistryKey? section, Dictionary<string, string?> data, Stack<string?> prefixStack)
@@ -83,5 +86,8 @@ namespace Appy.Configuration.WinRegistry
                 prefixStack.Pop();
             }
         }
+
+#pragma warning restore CA1416
+
     }
 }

@@ -4,6 +4,9 @@ using Xunit;
 
 namespace Appy.Configuration.WinRegistry.Tests
 {
+
+#pragma warning disable CA1416
+
     public class WinRegistryConfigurationTests
     {
         [Fact(Skip = "Manual execution only")]
@@ -41,6 +44,8 @@ namespace Appy.Configuration.WinRegistry.Tests
 
             databaseSettings.Should().BeEquivalentTo(expected);
         }
+
+#pragma warning restore CA1416
 
         private class DatabaseSettings
         {
