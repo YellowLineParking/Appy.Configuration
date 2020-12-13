@@ -10,24 +10,26 @@ Configuration providers for NETCore 2.2, 3.0, 3.1 and NET 5.0.
 
 | Package | Latest Stable |
 | --- | --- |
-| [Appy.Configuration.1Password](https://www.nuget.org/packages/Appy.Configuration.1Password) | [![Nuget Package](https://img.shields.io/badge/nuget-0.6.1-blue.svg)](https://www.nuget.org/packages/Appy.Configuration.1Password) |
-| [appy-op](https://www.nuget.org/packages/appy-op) | [![Nuget Package](https://img.shields.io/badge/nuget-0.6.1-blue.svg)](https://www.nuget.org/packages/appy-op) |
-| [Appy.Configuration.WinRegistry](https://www.nuget.org/packages/Appy.Configuration.WinRegistry) | [![Nuget Package](https://img.shields.io/badge/nuget-0.6.1-blue.svg)](https://www.nuget.org/packages/Appy.Configuration.WinRegistry) |
+| [Appy.Configuration.1Password](https://www.nuget.org/packages/Appy.Configuration.1Password) | [![Nuget Package](https://img.shields.io/badge/nuget-0.7.0-blue.svg)](https://www.nuget.org/packages/Appy.Configuration.1Password) |
+| [appy-op](https://www.nuget.org/packages/appy-op) | [![Nuget Package](https://img.shields.io/badge/nuget-0.7.0-blue.svg)](https://www.nuget.org/packages/appy-op) 
+| [appy-op (Docker Image)](https://hub.docker.com/r/appyway/appy-op/tags?page=1&ordering=last_updated) | [![Docker Image](https://img.shields.io/badge/docker-0.7.0-blue.svg)](https://hub.docker.com/r/appyway/appy-op/tags?page=1&ordering=last_updated) |
+| [Appy.Configuration.WinRegistry](https://www.nuget.org/packages/Appy.Configuration.WinRegistry) | [![Nuget Package](https://img.shields.io/badge/nuget-0.7.0-blue.svg)](https://www.nuget.org/packages/Appy.Configuration.WinRegistry) |
 
 ## Table of Contents
 
 - [1Password Configuration Provider](#1password-configuration-provider)
-    * [Installing](#installing-1)
-    * [Usage](#usage-1)
+    * [Installing](#installing)
+    * [Usage](#usage)
 - [Appy 1Password Tool](#appy-1password-tool)
     * [Prerequisites](#prerequisites)
-    * [Installing](#installing-2)
+    * [Installing](#installing-1)
     * [Signin to 1Password](#signin-to-1password)
     * [Auto-renew session activity](#auto-renew-session-activity)
     * [Nano Api and Docker](#nano-api-and-docker)
+    * [Tool as Docker Image](#tool-as-docker-image)
 - [Windows Registry Configuration Provider](#windows-registry-configuration-provider)
-    * [Installing](#installing)
-    * [Usage](#usage)
+    * [Installing](#installing-2)
+    * [Usage](#usage-1)
 
 ## 1Password Configuration Provider
 
@@ -48,7 +50,7 @@ PM> Install-Package Appy.Configuration.1Password
 When you install the package, it should be added to your _csproj_ file. Alternatively, you can add it directly by adding:
 
 ```xml
-<PackageReference Include="Appy.Configuration.1Password" Version="0.6.1" />
+<PackageReference Include="Appy.Configuration.1Password" Version="0.7.0" />
 ```
 
 Let's imagine we have a configuration file like the following appsettings.json file:
@@ -282,16 +284,46 @@ If this variable is set, the configuration requests are automatically redirected
 An example of execution could be the following:
 
 ```console
-docker run
---env ASPNETCORE_ENVIRONMENT=Development
---env APPY_OP_API_URI=http://host.docker.internal:5500/
---name appysample1passwordapi
+docker run \
+--env ASPNETCORE_ENVIRONMENT=Development \
+--env APPY_OP_API_URI=http://host.docker.internal:5500/ \
+--name appysample1passwordapi \
 dev
 ```
 
 Where the url points to the special DNS name host.docker.internal which resolves to the internal IP address used by the host, where the tool will be running.
 
 This option create an opportunity, where we can consume this api from projects in different programming languages.
+
+### Tool as Docker Image
+
+In case you want to use the appy-op as a docker image and thus avoid installing the 1Password cli or any dotnet dependency on your system, you can use the next command to run the image.
+
+```console
+docker run --rm -it -p 6000:6000 --name appy-op-test \
+appyway/appy-op -s <yourorg> <email-address> <secret_key> -vt Development -env DEV -a -api 6000
+```
+
+And to use appy-op with your host machine's existing config (or to persist configuration after the container exits):
+
+First time access:
+
+```console
+docker run --rm -it -e "HOME=$HOME" -v "$HOME:$HOME" -p 6000:6000 --name appy-op-test \
+appyway/appy-op -s <yourorg> <email-address> <secret_key> -vt Development -env DEV -a -api 6000
+```
+
+Later time access:
+
+```console
+docker run --rm -it -e "HOME=$HOME" -v "$HOME:$HOME" -p 6000:6000 --name appy-op-test \
+appyway/appy-op -s -vt Development -env DEV -a -api 6000
+```
+
+Or you could create your own script and add it to the bin folder to simplify the process.
+
+To communicate from your project with the tool, you could simply call the api as explained in the previous
+section, or create a shared network between your projects and the tool.
 
 ## Windows Registry Configuration Provider
 
@@ -312,7 +344,7 @@ PM> Install-Package Appy.Configuration.WinRegistry
 When you install the package, it should be added to your _csproj_ file. Alternatively, you can add it directly by adding:
 
 ```xml
-<PackageReference Include="Appy.Configuration.WinRegistry" Version="0.6.1" />
+<PackageReference Include="Appy.Configuration.WinRegistry" Version="0.7.0" />
 ```
 
 Now let's imagine we have a configuration file like the following appSettings.json:
