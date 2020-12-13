@@ -1,15 +1,22 @@
-#addin nuget:?package=Cake.Yaml&version=3.1.1
 #addin nuget:?package=YamlDotNet&version=8.1.2
+#addin nuget:?package=System.Xml.XDocument&version=4.3.0
+#addin nuget:?package=Cake.MinVer&version=1.0.0-rc0001
+#addin nuget:?package=Cake.Yaml&version=3.1.1
+#addin nuget:?package=Cake.Docker&version=0.11.1
 
 #load "./functions.cake"
 
-var configFilePath = "config.yml";
-var taskConfigManager = new ProjectTaskConfigurationManager();
-var projectConfigs = new ProjectConfigLoader().Load(Context, configFilePath).Projects;
 var basePath = "./src";
+var organization = "appyway";
 var artifactsPath = Context.Directory("./.artifacts");
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
+var configFilePath = "config.yml";
+var taskConfigManager = new ProjectTaskConfigurationManager();
+var projectDescriptors = ProjectLoader.Load(Context, configFilePath, basePath, configuration).Projects;
+var version = MinVer(settings => settings
+    .WithDefaultPreReleasePhase("preview")
+    .WithVerbosity(MinVerVerbosity.Info));
 
 ////////////////////////////////////////////////////////////////
 // Setup
@@ -17,10 +24,17 @@ var configuration = Argument("configuration", "Release");
 Setup((context) =>
 {
     Information("AppyWay");
+    Information($"Version: {version.Version}");
 });
 
 ////////////////////////////////////////////////////////////////
 // Tasks
+
+Task("Clean")
+    .Does(context =>
+{
+    context.CleanDirectory(artifactsPath);
+});
 
 Task("Restore")
     .Does(() =>
@@ -32,16 +46,17 @@ Task("Restore")
         });
 });
 
-Task("Build")
+Task("Build-Project")
     .IsDependentOn("Restore")
     .Does(context =>
 {
-    foreach(var projectConfig in projectConfigs)
+    foreach(var projectDescriptor in projectDescriptors)
     {
-        if (!taskConfigManager.CanBuild(projectConfig)) continue;
+        if (!taskConfigManager.CanBuild(projectDescriptor.Config)) continue;
 
-        var projectPath = BuildProjectPath(basePath, projectConfig);
-        DotNetCoreBuild(projectPath, new DotNetCoreBuildSettings {
+        var projectFilePath = projectDescriptor.Document.ProjectFileFullPath;
+
+        DotNetCoreBuild(projectFilePath, new DotNetCoreBuildSettings {
             Configuration = configuration,
             NoRestore = true,
             NoIncremental = context.HasArgument("rebuild"),
@@ -51,42 +66,68 @@ Task("Build")
     }
 });
 
-Task("Test")
-    .IsDependentOn("Build")
+Task("Build-Docker")
     .Does(context =>
 {
-    foreach(var projectConfig in projectConfigs)
+    foreach(var projectDescriptor in projectDescriptors)
     {
-        if (!taskConfigManager.CanTest(projectConfig)) continue;
+        if (!taskConfigManager.CanBuildDocker(projectDescriptor.Config)) continue;
 
-        var projectPath = BuildProjectPath(basePath, projectConfig);
-        DotNetCoreTest(projectPath, new DotNetCoreTestSettings {
+        var dockerFilePath = context.BuildDockerFilePath(basePath, projectDescriptor.Config);
+
+        if (!FileExists(dockerFilePath)) continue;
+
+        var repository = $"{organization}/{projectDescriptor.Document.DotNet.PackageId}";
+
+        var tags = new[] { version.Version, "latest" };
+
+        var settings = new DockerImageBuildSettings
+        {
+            File = dockerFilePath,
+            BuildArg = new[] { $"configuration={configuration}" },
+            Pull = false,
+            Tag = tags.Select(tag => $"{repository}:{tag}").ToArray()
+        };
+
+        DockerBuild(settings, ".");
+    }
+});
+
+Task("Test")
+    .IsDependentOn("Build-Project")
+    .Does(context =>
+{
+    foreach(var projectDescriptor in projectDescriptors)
+    {
+        if (!taskConfigManager.CanTest(projectDescriptor.Config)) continue;
+
+        var projectFilePath = projectDescriptor.Document.ProjectFileFullPath;
+
+        DotNetCoreTest(projectFilePath, new DotNetCoreTestSettings {
             Configuration = configuration,
             NoRestore = true,
             NoBuild = true,
             TestAdapterPath = ".",
             Loggers = new string[] {
-                // $"xunit;LogFilePath={MakeAbsolute(artifactsPath).FullPath}/xunit-{projectConfig.Name}.xml",
+                // $"xunit;LogFilePath={MakeAbsolute(artifactsPath).FullPath}/xunit-{projectDescriptor.Config.Name}.xml",
                 "GitHubActions;report-warnings=false"
             },
             Verbosity = DotNetCoreVerbosity.Quiet
         });
     }
-
 });
 
 Task("Package")
     .IsDependentOn("Test")
     .Does(context =>
 {
-    context.CleanDirectory("./.artifacts");
-
-    foreach(var projectConfig in projectConfigs)
+    foreach(var projectDescriptor in projectDescriptors)
     {
-        if (!taskConfigManager.CanPack(projectConfig)) continue;
+        if (!taskConfigManager.CanPack(projectDescriptor.Config)) continue;
 
-        var projectPath = BuildProjectPath(basePath, projectConfig);
-        context.DotNetCorePack(projectPath, new DotNetCorePackSettings {
+        var projectFilePath = projectDescriptor.Document.ProjectFileFullPath;
+
+        context.DotNetCorePack(projectFilePath, new DotNetCorePackSettings {
             Configuration = configuration,
             NoRestore = true,
             NoBuild = true,
@@ -97,7 +138,7 @@ Task("Package")
     }
 });
 
-Task("Publish-GitHub")
+Task("Publish-Package-GitHub")
     .WithCriteria(ctx => BuildSystem.IsRunningOnGitHubActions, "Not running on GitHub Actions")
     .IsDependentOn("Package")
     .Does(context =>
@@ -108,15 +149,19 @@ Task("Publish-GitHub")
     }
 
     var exitCode = 0;
-    foreach(var file in context.GetFiles("./.artifacts/*.nupkg"))
+    foreach(var projectDescriptor in projectDescriptors)
     {
-        context.Information("Publishing {0}...", file.GetFilename().FullPath);
+        if (!taskConfigManager.CanPack(projectDescriptor.Config)) continue;
+
+        var nugetPkgFilePath = context.BuildNugetPackagePath(artifactsPath, projectDescriptor);
+
+        context.Information("Publishing {0} to Github", nugetPkgFilePath);
         exitCode += StartProcess("dotnet",
             new ProcessSettings {
                 Arguments = new ProcessArgumentBuilder()
                     .Append("gpr")
                     .Append("push")
-                    .AppendQuoted(file.FullPath)
+                    .AppendQuoted(nugetPkgFilePath)
                     .AppendSwitchSecret("-k", " ", apiKey)
             }
         );
@@ -128,7 +173,7 @@ Task("Publish-GitHub")
     }
 });
 
-Task("Publish-NuGet")
+Task("Publish-Package-NuGet")
     .WithCriteria(ctx => BuildSystem.IsRunningOnGitHubActions, "Not running on GitHub Actions")
     .IsDependentOn("Package")
     .Does(context =>
@@ -138,10 +183,15 @@ Task("Publish-NuGet")
         throw new CakeException("No NuGet API key was provided.");
     }
 
-    foreach(var file in context.GetFiles("./.artifacts/*.nupkg"))
+    foreach(var projectDescriptor in projectDescriptors)
     {
-        context.Information("Publishing {0}...", file.GetFilename().FullPath);
-        DotNetCoreNuGetPush(file.FullPath, new DotNetCoreNuGetPushSettings
+        if (!taskConfigManager.CanPack(projectDescriptor.Config)) continue;
+
+        var nugetPkgFilePath = context.BuildNugetPackagePath(artifactsPath, projectDescriptor);
+
+        context.Information("Publishing {0} to Nuget", nugetPkgFilePath);
+
+        DotNetCoreNuGetPush(nugetPkgFilePath, new DotNetCoreNuGetPushSettings
         {
             Source = "https://api.nuget.org/v3/index.json",
             ApiKey = apiKey,
@@ -149,18 +199,52 @@ Task("Publish-NuGet")
     }
 });
 
+Task("Publish-Docker-DockerHub")
+    .IsDependentOn("Build-Docker")
+    .WithCriteria(ctx => BuildSystem.IsRunningOnGitHubActions, "Not running on GitHub Actions")
+    // .WithCriteria(() => Build.Version.IsPublic, "Not public")
+    .Does(context =>
+{
+    foreach(var projectDescriptor in projectDescriptors)
+    {
+        if (!taskConfigManager.CanBuildDocker(projectDescriptor.Config)) continue;
+
+        var dockerFilePath = context.BuildDockerFilePath(basePath, projectDescriptor.Config);
+
+        if (!FileExists(dockerFilePath)) continue;
+
+        var repository = $"{organization}/{projectDescriptor.Document.DotNet.PackageId}";
+
+        var tags = new[] { version.Version, "latest" };
+
+        foreach(var tag in tags)
+        {
+            DockerPush($"{repository}:{tag}");
+            // DockerTag();
+        }
+    }
+});
+
 ////////////////////////////////////////////////////////////////
 // Targets
 
 Task("Publish")
-    .IsDependentOn("Publish-GitHub")
-    .IsDependentOn("Publish-NuGet");
+    .IsDependentOn("Publish-Package-GitHub")
+    .IsDependentOn("Publish-Package-NuGet")
+    .IsDependentOn("Publish-Docker-DockerHub");
 
 Task("Default")
+    .IsDependentOn("Clean")
+    .IsDependentOn("Build-Project")
+    .IsDependentOn("Package");
+
+Task("Docker")
+    .IsDependentOn("Clean")
+    .IsDependentOn("Build-Project")
+    .IsDependentOn("Build-Docker")
     .IsDependentOn("Package");
 
 ////////////////////////////////////////////////////////////////
 // Execution
 
 RunTarget(target)
-

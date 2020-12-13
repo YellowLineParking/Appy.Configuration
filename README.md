@@ -17,17 +17,18 @@ Configuration providers for NETCore 2.2, 3.0, 3.1 and NET 5.0.
 ## Table of Contents
 
 - [1Password Configuration Provider](#1password-configuration-provider)
-    * [Installing](#installing-1)
-    * [Usage](#usage-1)
+    * [Installing](#installing)
+    * [Usage](#usage)
 - [Appy 1Password Tool](#appy-1password-tool)
     * [Prerequisites](#prerequisites)
-    * [Installing](#installing-2)
+    * [Installing](#installing-1)
     * [Signin to 1Password](#signin-to-1password)
     * [Auto-renew session activity](#auto-renew-session-activity)
     * [Nano Api and Docker](#nano-api-and-docker)
+    * [Tool as Docker Image](#tool-as-docker-image)
 - [Windows Registry Configuration Provider](#windows-registry-configuration-provider)
-    * [Installing](#installing)
-    * [Usage](#usage)
+    * [Installing](#installing-2)
+    * [Usage](#usage-1)
 
 ## 1Password Configuration Provider
 
@@ -282,16 +283,46 @@ If this variable is set, the configuration requests are automatically redirected
 An example of execution could be the following:
 
 ```console
-docker run
---env ASPNETCORE_ENVIRONMENT=Development
---env APPY_OP_API_URI=http://host.docker.internal:5500/
---name appysample1passwordapi
+docker run \
+--env ASPNETCORE_ENVIRONMENT=Development \
+--env APPY_OP_API_URI=http://host.docker.internal:5500/ \
+--name appysample1passwordapi \
 dev
 ```
 
 Where the url points to the special DNS name host.docker.internal which resolves to the internal IP address used by the host, where the tool will be running.
 
 This option create an opportunity, where we can consume this api from projects in different programming languages.
+
+### Tool as Docker Image
+
+In case you want to use the appy-op as a docker image and thus avoid installing the 1Password cli or any dotnet dependency on your system, you can use the next command to run the image.
+
+```console
+docker run --rm -it -p 6000:6000 --name appy-op-test \
+appy-op -s <yourorg> <email-address> <secret_key> -vt Development -env DEV -a -api 6000
+```
+
+And to use appy-op with your host machine's existing config (or to persist configuration after the container exits):
+
+First time access:
+
+```console
+docker run --rm -it -e "HOME=$HOME" -v "$HOME:$HOME" -p 6000:6000 --name appy-op-test \
+appy-op -s <yourorg> <email-address> <secret_key> -vt Development -env DEV -a -api 6000
+```
+
+Later time access:
+
+```console
+docker run --rm -it -e "HOME=$HOME" -v "$HOME:$HOME" -p 6000:6000 --name appy-op-test \
+appy-op -s -vt Development -env DEV -a -api 6000
+```
+
+Or you could create your own script and add it to the bin folder to simplify the process.
+
+To communicate from your project with the tool, you could simply call the api as explained in the previous
+section, or create a shared network between your projects and the tool.
 
 ## Windows Registry Configuration Provider
 

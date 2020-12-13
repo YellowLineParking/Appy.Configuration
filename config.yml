@@ -9,8 +9,8 @@ Appy.Configuration.1Password:
 Appy.Tool.1Password:
   Type: Package
 Appy.Infrastructure.1Password.Tests:
-  Type: XUnit
+  Type: Test
 Appy.Configuration.1Password.Tests:
-  Type: XUnit
+  Type: Test
 Appy.Tool.1Password.Tests:
-  Type: XUnit
+  Type: Test

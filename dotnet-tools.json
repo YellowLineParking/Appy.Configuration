@@ -8,6 +8,12 @@
         "dotnet-cake"
       ]
     },
+    "minver-cli": {
+      "version": "2.3.1",
+      "commands": [
+        "minver"
+      ]
+    },
     "gpr": {
       "version": "0.1.224",
       "commands": [
