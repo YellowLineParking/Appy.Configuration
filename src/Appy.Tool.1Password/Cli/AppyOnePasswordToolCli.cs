@@ -13,6 +13,7 @@ using Appy.Tool.OnePassword.Api;
 using Appy.Tool.OnePassword.Logging;
 using McMaster.Extensions.CommandLineUtils;
 using Appy.Configuration.Scheduling;
+using Appy.Configuration.Validation;
 
 namespace Appy.Tool.OnePassword.Cli
 {
@@ -185,11 +186,17 @@ namespace Appy.Tool.OnePassword.Cli
             }
             catch (CommandParsingException ex)
             {
-                var p = ex.Command;
-
                 _logger.LogError(ex.Message);
 
                 app.ShowHelp();
+
+                return 1;
+            }
+            catch (ValidationException ex)
+            {
+                var result = ex.Result?.Errors?.FirstOrDefault()?.Message;
+
+                _logger.LogError(result);
 
                 return 1;
             }

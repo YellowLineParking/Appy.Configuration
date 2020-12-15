@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Appy.Infrastructure.OnePassword.Model;
 using Appy.Infrastructure.OnePassword.Queries;
-using Appy.Infrastructure.OnePassword.Tests.Tooling.Fixtures;
+using Appy.Infrastructure.OnePassword.Tests.Fixtures;
 using Appy.Infrastructure.OnePassword.Tooling;
 using Xunit;
 
@@ -70,7 +70,7 @@ namespace Appy.Infrastructure.OnePassword.Tests.Tooling
             }
             public Fixture WithCurrentSession()
             {
-                SessionStorage.SetupAndReturns(AppyOnePasswordSession.New(
+                SessionStorage.SetupGetAndReturns(AppyOnePasswordSession.New(
                     organization: Organization,
                     vault: Vault,
                     environment: Environment,

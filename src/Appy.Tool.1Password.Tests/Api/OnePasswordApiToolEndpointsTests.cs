@@ -8,7 +8,7 @@ using Appy.Configuration.Validation;
 using Appy.Infrastructure.OnePassword.ApiClient;
 using Appy.Infrastructure.OnePassword.Model;
 using Appy.Infrastructure.OnePassword.Queries;
-using Appy.Infrastructure.OnePassword.Tests.Tooling.Fixtures;
+using Appy.Infrastructure.OnePassword.Tests.Fixtures;
 using Appy.Infrastructure.OnePassword.Tooling;
 using Appy.Tool.OnePassword.Tests.Api.Fixtures;
 using FluentAssertions;
@@ -75,7 +75,7 @@ namespace Appy.Tool.OnePassword.Tests.Api
                 response.Message.Should().Be("The request is invalid");
                 response.Errors.Count.Should().Be(1);
                 response.Errors.First().Property.Should().Be("item");
-                response.Errors.First().Message.Should().Be("1Password AppName must be specified");
+                response.Errors.First().Message.Should().Be("1Password AppName must be specified.");
             }
 
             public void Dispose() => _apiTestFixture.Dispose();

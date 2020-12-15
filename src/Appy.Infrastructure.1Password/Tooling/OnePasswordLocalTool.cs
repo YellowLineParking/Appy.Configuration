@@ -58,7 +58,7 @@ namespace Appy.Infrastructure.OnePassword.Tooling
                     .Append("list")
                     .Append("vaults"),
                 EnvironmentVariables = new Dictionary<string, string>()
-                    .AddValue("OP_SESSION_{organization}", sessionToken)
+                    .AddValue($"OP_SESSION_{organization}", sessionToken)
             };
 
             return processRunner.Run(ToolPath, processSettings);
@@ -138,7 +138,7 @@ namespace Appy.Infrastructure.OnePassword.Tooling
                 Vaults = vaults
             };
         }
-        
+
         ///<inheritdoc cref="IOnePasswordTool"/>
         public async Task<SignInOnePasswordResult> Execute(SignInOnePasswordCommand command, CancellationToken cancellationToken = default)
         {
