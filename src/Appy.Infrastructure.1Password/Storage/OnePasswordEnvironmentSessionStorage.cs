@@ -9,7 +9,7 @@ namespace Appy.Infrastructure.OnePassword.Storage
     {
         readonly IPlatformInformation _platformInfo;
         readonly IEnvironmentAccessor _envAccessor;
-        
+
         public OnePasswordEnvironmentSessionStorage(
             IPlatformInformation platformInfo,
             IEnvironmentAccessor envAccessor)
@@ -45,11 +45,11 @@ namespace Appy.Infrastructure.OnePassword.Storage
                 throw new PlatformNotSupportedException("Updating a session using environment variables is not supported on your OS.");
             }
 
-            if (session == null) throw new ArgumentException("1Password Session should not be null", nameof(session));
-            if (string.IsNullOrWhiteSpace(session.Organization)) throw new ArgumentException("1Password Organization must be specified", nameof(AppyOnePasswordSession.Organization));
-            if (string.IsNullOrWhiteSpace(session.Environment)) throw new ArgumentException("1Password Execution Environment must be specified", nameof(AppyOnePasswordSession.Environment));
-            if (string.IsNullOrWhiteSpace(session.SessionToken)) throw new ArgumentException("1Password SessionToken must be specified", nameof(AppyOnePasswordSession.SessionToken));
-            if (string.IsNullOrWhiteSpace(session.Vault)) throw new ArgumentException("1Password Vault must be specified", nameof(session.Vault));
+            if (session == null) throw new ArgumentException("1Password Session should not be null.");
+            if (string.IsNullOrWhiteSpace(session.Organization)) throw new ArgumentException("1Password Organization must be specified.");
+            if (string.IsNullOrWhiteSpace(session.Environment)) throw new ArgumentException("1Password Environment must be specified.");
+            if (string.IsNullOrWhiteSpace(session.Vault)) throw new ArgumentException("1Password Vault must be specified.");
+            if (string.IsNullOrWhiteSpace(session.SessionToken)) throw new ArgumentException("1Password SessionToken must be specified.");
 
             _envAccessor.SetUserEnvironmentVariable(KnownSessionVars.OnePasswordOrganization, session.Organization);
             _envAccessor.SetUserEnvironmentVariable(KnownSessionVars.OnePasswordEnvironment, session.Environment);
