@@ -53,7 +53,8 @@ namespace Appy.Configuration.OnePassword.Internals
             services
                 .AddSingleton<OnePasswordApiClientSettings>()
                 .AddSingleton<IOnePasswordApiClientFactory>(sp => new OnePasswordApiClientFactory(
-                    sp.GetRequiredService<IHttpClientFactory>()))
+                    sp.GetRequiredService<IHttpClientFactory>(),
+                    sp.GetRequiredService<IAppyJsonSerializer>()))
                 .AddIfElse(useLocalTool,
                     s => s.AddSingleton<IOnePasswordTool, OnePasswordLocalTool>(),
                     s => s.AddSingleton<IOnePasswordTool, OnePasswordRemoteTool>());

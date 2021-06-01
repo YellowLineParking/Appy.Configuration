@@ -44,7 +44,6 @@
 
   <PropertyGroup Label="Package Versions">
     <MicrosoftWin32RegistryPackageVersion>5.0.0</MicrosoftWin32RegistryPackageVersion>
-    <FlurlPackageVersion>3.0.0</FlurlPackageVersion>
     <NewtonsoftJsonPackageVersion>12.0.3</NewtonsoftJsonPackageVersion>
     <MedallionShellPackageVersion>1.6.1</MedallionShellPackageVersion>
     <McMasterExtensionsCommandLineUtilsPackageVersion>3.1.0-rc.371</McMasterExtensionsCommandLineUtilsPackageVersion>

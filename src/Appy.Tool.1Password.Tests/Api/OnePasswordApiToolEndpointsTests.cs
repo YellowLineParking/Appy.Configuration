@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Appy.Configuration;
 using Appy.Configuration.Common;
+using Appy.Configuration.Serializers;
 using Appy.Configuration.Validation;
 using Appy.Infrastructure.OnePassword.ApiClient;
 using Appy.Infrastructure.OnePassword.Model;
@@ -12,7 +13,6 @@ using Appy.Infrastructure.OnePassword.Tests.Fixtures;
 using Appy.Infrastructure.OnePassword.Tooling;
 using Appy.Tool.OnePassword.Tests.Api.Fixtures;
 using FluentAssertions;
-using Flurl.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Abstractions;
@@ -68,7 +68,7 @@ namespace Appy.Tool.OnePassword.Tests.Api
                 Func<Task> act = async () => await fixture.RemoteTool.Execute(query);
 
                 var assertion = await act.Should().ThrowAsync<OnePasswordToolException>();
-                assertion.WithInnerException<FlurlHttpException>();
+                assertion.WithInnerException<OnePasswordApiClientException>();
 
                 var response = assertion.And.GetContentAs<Response>();
                 response.Success.Should().BeFalse();
@@ -101,7 +101,7 @@ namespace Appy.Tool.OnePassword.Tests.Api
                 Func<Task> act = async () => await fixture.RemoteTool.Execute(query);
 
                 var assertion = await act.Should().ThrowAsync<OnePasswordToolException>();
-                assertion.WithInnerException<FlurlHttpException>();
+                assertion.WithInnerException<OnePasswordApiClientException>();
 
                 var response = assertion.And.GetContentAs<Response>();
                 response.Success.Should().BeFalse();
@@ -130,7 +130,7 @@ namespace Appy.Tool.OnePassword.Tests.Api
                 Func<Task> act = async () => await fixture.RemoteTool.Execute(query);
 
                 var assertion = await act.Should().ThrowAsync<OnePasswordToolException>();
-                assertion.WithInnerException<FlurlHttpException>();
+                assertion.WithInnerException<OnePasswordApiClientException>();
 
                 var response = assertion.And.GetContentAs<Response>();
                 response.Success.Should().BeFalse();
@@ -155,11 +155,11 @@ namespace Appy.Tool.OnePassword.Tests.Api
                 _apiTestFixture = apiTestFixture;
                 _apiTestFixture.ServicesConfiguration = services => services
                     .ReplaceSingleton<IOnePasswordTool>(sp =>
-                        LocalTool.Object.WithValidation(sp.GetService<IValidator>()));
+                        LocalTool.Object.WithValidation(sp.GetService<IValidator>()!));
 
                 LocalTool = new OnePasswordToolMock();
                 RemoteTool = new OnePasswordRemoteTool(
-                    new OnePasswordApiTestClientFactory(_apiTestFixture.CreateClient()));
+                    new OnePasswordApiTestClientFactory(_apiTestFixture.CreateClient(), new NewtonsoftAppyJsonSerializer()));
 
                 Organization = "appy";
                 Environment = "DEV";

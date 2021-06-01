@@ -1,26 +1,54 @@
+using System;
 using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Appy.Configuration.Serializers;
 using Appy.Infrastructure.OnePassword.Queries;
-using Flurl.Http;
 
 namespace Appy.Infrastructure.OnePassword.ApiClient
 {
     public class OnePasswordApiClient
     {
-        readonly FlurlClient  _client;
+        readonly HttpClient _httpClient;
+        readonly IAppyJsonSerializer _jsonSerializer;
 
-        public OnePasswordApiClient(HttpClient httpClient)
+        public OnePasswordApiClient(
+            HttpClient httpClient,
+            IAppyJsonSerializer jsonSerializer)
         {
-            _client = new FlurlClient(httpClient);
+            _httpClient = httpClient;
+            _jsonSerializer = jsonSerializer;
         }
 
-        public virtual Task<Response<GetOnePasswordNoteQueryResult>> Execute(GetOnePasswordNoteQuery query, CancellationToken cancellationToken = default(CancellationToken))
+        public virtual Task<Response<GetOnePasswordNoteQueryResult>> Execute(GetOnePasswordNoteQuery query, CancellationToken cancellationToken = default)
         {
-            return _client
-                .Request("queries/getOnePasswordNote")
-                .PostJsonAsync(query, cancellationToken)
-                .ReceiveJson<Response<GetOnePasswordNoteQueryResult>>();
+            return PostJsonAsync<GetOnePasswordNoteQueryResult>("queries/getOnePasswordNote", query, cancellationToken);
+        }
+
+        async Task<Response<TResponse>> PostJsonAsync<TResponse>(string url, object request, CancellationToken cancellationToken)
+        {
+            var content = _jsonSerializer.Serialize(request);
+
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(_httpClient.BaseAddress, url),
+                Content = new StringContent(content, Encoding.UTF8, "application/json")
+            };
+
+            var rawResponse = await _httpClient.SendAsync(requestMessage, cancellationToken);
+
+            var json = await rawResponse.Content.ReadAsStringAsync();
+
+            var response = _jsonSerializer.Deserialize<Response<TResponse>>(json);
+
+            if (rawResponse.IsSuccessStatusCode)
+                return response;
+
+            throw new OnePasswordApiClientException(
+                statusCode: (int)rawResponse.StatusCode,
+                response);
         }
     }
 }
