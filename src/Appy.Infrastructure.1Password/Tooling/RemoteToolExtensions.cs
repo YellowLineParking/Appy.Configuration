@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using Appy.Infrastructure.OnePassword.ApiClient;
-using Flurl.Http;
 
 namespace Appy.Infrastructure.OnePassword.Tooling
 {
@@ -24,9 +23,9 @@ namespace Appy.Infrastructure.OnePassword.Tooling
 
                 message = response?.Message!;
             }
-            catch (FlurlHttpException httpException)
+            catch (OnePasswordApiClientException httpException)
             {
-                var response = await httpException.GetResponseJsonAsync<Response>();
+                var response = httpException.Response;
                 message = response?.Message;
                 exceptionResult = response;
                 innerException = httpException;
