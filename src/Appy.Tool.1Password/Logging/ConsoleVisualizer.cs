@@ -24,8 +24,8 @@ namespace Appy.Tool.OnePassword.Logging
                 .AsciiBorder()
                 .HideHeaders();
 
-            AnsiConsole.Render(headerTable);
-            AnsiConsole.Render(sessionTable);
+            AnsiConsole.Write(headerTable);
+            AnsiConsole.Write(sessionTable);
         }
     }
 }
