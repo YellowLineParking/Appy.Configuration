@@ -1,9 +1,9 @@
-FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim AS base
+FROM mcr.microsoft.com/dotnet/aspnet:6.0-bullseye-slim AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim AS build
 
 ARG configuration=Release
 
@@ -27,7 +27,7 @@ RUN dotnet publish "Appy.Tool.1Password.csproj" -c $configuration -o /app/publis
 
 FROM base AS final
 # Install 1Password CLI (op)
-ENV OP_VERSION 1.8.0
+ENV OP_VERSION 1.12.3
 RUN buildDeps="curl gnupg dirmngr unzip" \
     && runDeps="ca-certificates" \
     && apt-get update \

@@ -3,7 +3,7 @@
   "isRoot": true,
   "tools": {
     "cake.tool": {
-      "version": "1.0.0-rc0001",
+      "version": "2.0.0-rc0001",
       "commands": [
         "dotnet-cake"
       ]
@@ -18,6 +18,12 @@
       "version": "0.1.224",
       "commands": [
         "gpr"
+      ]
+    },
+    "appy-op": {
+      "version": "0.8.0",
+      "commands": [
+        "appy-op"
       ]
     }
   }

@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup Label="Settings">
     <Deterministic>true</Deterministic>
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>latest</LangVersion>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>embedded</DebugType>
     <MinVerSkip Condition="'$(Configuration)' == 'Debug'">true</MinVerSkip>
@@ -24,7 +24,7 @@
     <PackageProjectUrl>https://github.com/YellowLineParking/Appy.Configuration</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReleaseNotes>https://github.com/YellowLineParking/Appy.Configuration/releases</PackageReleaseNotes>
-    <PackageTags>NETCore;configuration;providers;cli;tools</PackageTags>
+    <PackageTags>NET6;NET5;NETCore;configuration;providers;cli;tools</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -45,16 +45,16 @@
   <PropertyGroup Label="Package Versions">
     <MicrosoftWin32RegistryPackageVersion>5.0.0</MicrosoftWin32RegistryPackageVersion>
     <NewtonsoftJsonPackageVersion>12.0.3</NewtonsoftJsonPackageVersion>
-    <MedallionShellPackageVersion>1.6.1</MedallionShellPackageVersion>
-    <McMasterExtensionsCommandLineUtilsPackageVersion>3.1.0-rc.371</McMasterExtensionsCommandLineUtilsPackageVersion>
-    <SpectreConsolePackageVersion>0.33.0</SpectreConsolePackageVersion>
+    <MedallionShellPackageVersion>1.6.2</MedallionShellPackageVersion>
+    <McMasterExtensionsCommandLineUtilsPackageVersion>3.1.0</McMasterExtensionsCommandLineUtilsPackageVersion>
+    <SpectreConsolePackageVersion>0.42.0</SpectreConsolePackageVersion>
     <TunnelVisionLabsRefAssemblyAnnotatorPackageVersion>1.0.0-alpha.160</TunnelVisionLabsRefAssemblyAnnotatorPackageVersion>
     <NullablePackageVersion>1.2.1</NullablePackageVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Test Package Versions">
     <MartinCostelloLoggingXUnitPackageVersion>0.1.0</MartinCostelloLoggingXUnitPackageVersion>
-    <MicrosoftNETTestSdkPackageVersion>16.7.0</MicrosoftNETTestSdkPackageVersion>
+    <MicrosoftNETTestSdkPackageVersion>17.0.0</MicrosoftNETTestSdkPackageVersion>
     <FluentAssertionsPackageVersion>5.10.3</FluentAssertionsPackageVersion>
     <MoqPackageVersion>4.14.6</MoqPackageVersion>
     <XunitPackageVersion>2.4.1</XunitPackageVersion>
