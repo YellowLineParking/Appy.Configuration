@@ -39,8 +39,8 @@ Task("Clean")
 Task("Restore")
     .Does(() =>
 {
-    DotNetCoreRestore(basePath,
-        new DotNetCoreRestoreSettings
+    DotNetRestore(basePath,
+        new DotNetRestoreSettings
         {
             Verbosity = DotNetCoreVerbosity.Minimal
         });
@@ -56,7 +56,7 @@ Task("Build-Project")
 
         var projectFilePath = projectDescriptor.Document.ProjectFileFullPath;
 
-        DotNetCoreBuild(projectFilePath, new DotNetCoreBuildSettings {
+        DotNetBuild(projectFilePath, new DotNetBuildSettings {
             Configuration = configuration,
             NoRestore = true,
             NoIncremental = context.HasArgument("rebuild"),
@@ -103,7 +103,7 @@ Task("Test")
 
         var projectFilePath = projectDescriptor.Document.ProjectFileFullPath;
 
-        DotNetCoreTest(projectFilePath, new DotNetCoreTestSettings {
+        DotNetTest(projectFilePath, new DotNetTestSettings {
             Configuration = configuration,
             NoRestore = true,
             NoBuild = true,
@@ -127,7 +127,7 @@ Task("Package")
 
         var projectFilePath = projectDescriptor.Document.ProjectFileFullPath;
 
-        context.DotNetCorePack(projectFilePath, new DotNetCorePackSettings {
+        context.DotNetPack(projectFilePath, new DotNetPackSettings {
             Configuration = configuration,
             NoRestore = true,
             NoBuild = true,
@@ -191,10 +191,10 @@ Task("Publish-Package-NuGet")
 
         context.Information("Publishing {0} to Nuget", nugetPkgFilePath);
 
-        DotNetCoreNuGetPush(nugetPkgFilePath, new DotNetCoreNuGetPushSettings
+        DotNetNuGetPush(nugetPkgFilePath, new DotNetNuGetPushSettings
         {
             Source = "https://api.nuget.org/v3/index.json",
-            ApiKey = apiKey,
+            ApiKey = apiKey
         });
     }
 });
@@ -233,7 +233,7 @@ Task("Publish-Docker-DockerHub")
 // Targets
 
 Task("Publish")
-    .IsDependentOn("Publish-Package-GitHub")
+    // .IsDependentOn("Publish-Package-GitHub")
     .IsDependentOn("Publish-Package-NuGet")
     .IsDependentOn("Publish-Docker-DockerHub");
 
