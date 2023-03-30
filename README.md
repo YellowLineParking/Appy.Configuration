@@ -6,6 +6,8 @@
 
 Configuration providers for NETCore 3.1, NET 5.0 and NET6.0.
 
+The latest supported version of 1Password CLI is 1.12.5.
+
 ## Configuration Providers
 
 | Package | Latest Stable |
@@ -176,7 +178,7 @@ For an easy installation, we recommend that you first install [Chocolatey Packag
 Open a Powershell console and install 1Password CLI:
 
 ```console
-choco install op
+choco install op --version=1.12.5 
 ```
 
 #### MacOS
@@ -186,7 +188,7 @@ For an easy installation, we recommend that you first install [Brew Package Mana
 Open a console and install 1Password CLI using brew cask:
 
 ```console
-brew cask install 1password-cli
+brew install 1password-cli1
 ```
 
 #### Linux

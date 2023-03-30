@@ -82,7 +82,8 @@ Before you submit your pull request consider the following guidelines:
 * Build your changes locally to ensure all the tests pass:
 
     ```shell
-    build.ps1
+    dotnet tool restore
+    dotnet cake
     ```
 
 * Push your branch to GitHub:
