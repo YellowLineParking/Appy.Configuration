@@ -1,9 +1,8 @@
 using Appy.Infrastructure.OnePassword.Model;
 
-namespace Appy.Tool.OnePassword.Logging
+namespace Appy.Tool.OnePassword.Logging;
+
+public interface IConsoleVisualzer
 {
-    public interface IConsoleVisualzer
-    {
-        void Render(AppyOnePasswordSession session);
-    }
+    void Render(AppyOnePasswordSession session);
 }

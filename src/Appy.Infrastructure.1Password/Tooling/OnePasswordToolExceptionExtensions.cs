@@ -1,10 +1,9 @@
-namespace Appy.Infrastructure.OnePassword.Tooling
+namespace Appy.Infrastructure.OnePassword.Tooling;
+
+public static class OnePasswordToolExceptionExtensions
 {
-    public static class OnePasswordToolExceptionExtensions
+    public static TContent GetContentAs<TContent>(this OnePasswordToolException exception)
     {
-        public static TContent GetContentAs<TContent>(this OnePasswordToolException exception)
-        {
-            return (TContent)exception.Result;
-        }
+        return (TContent)exception.Result;
     }
 }

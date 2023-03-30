@@ -1,9 +1,8 @@
-namespace Appy.Configuration.Common
+namespace Appy.Configuration.Common;
+
+public interface IEnvironmentAccessor
 {
-    public interface IEnvironmentAccessor
-    {
-        string GetUserEnvironmentVariable(string environmentVariable);
-        string GetProcessEnvironmentVariable(string environmentVariable);
-        void SetUserEnvironmentVariable(string environmentVariable, string? value);
-    }
+    string GetUserEnvironmentVariable(string environmentVariable);
+    string GetProcessEnvironmentVariable(string environmentVariable);
+    void SetUserEnvironmentVariable(string environmentVariable, string? value);
 }

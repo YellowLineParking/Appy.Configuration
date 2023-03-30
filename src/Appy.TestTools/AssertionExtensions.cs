@@ -1,10 +1,9 @@
 using Newtonsoft.Json;
 
-namespace Appy.TestTools
+namespace Appy.TestTools;
+
+public static class AssertionExtensions
 {
-    public static class AssertionExtensions
-    {
-        public static bool IsEquivalentTo<T>(this T obj, T other) =>
-            JsonConvert.SerializeObject(obj) == JsonConvert.SerializeObject(other);
-    }
+    public static bool IsEquivalentTo<T>(this T obj, T other) =>
+        JsonConvert.SerializeObject(obj) == JsonConvert.SerializeObject(other);
 }

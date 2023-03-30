@@ -2,43 +2,42 @@ using Appy.Infrastructure.OnePassword.Queries;
 using FluentAssertions;
 using Xunit;
 
-namespace Appy.Infrastructure.OnePassword.Tests.Validation
+namespace Appy.Infrastructure.OnePassword.Tests.Validation;
+
+public class GetOnePasswordVaultsQueryValidatorTests
 {
-    public class GetOnePasswordVaultsQueryValidatorTests
+    [Theory]
+    [InlineData("", "")]
+    [InlineData("appy", "")]
+    public void ShouldBeInvalidWhenAnyPropertyIsEmpty(string organization, string sessionToken)
     {
-        [Theory]
-        [InlineData("", "")]
-        [InlineData("appy", "")]
-        public void ShouldBeInvalidWhenAnyPropertyIsEmpty(string organization, string sessionToken)
+        var sut = new GetOnePasswordVaultsQueryValidator();
+
+        var query = new GetOnePasswordVaultsQuery
         {
-            var sut = new GetOnePasswordVaultsQueryValidator();
+            Organization = organization,
+            SessionToken = sessionToken
+        };
+        var result = sut.Validate(query);
 
-            var query = new GetOnePasswordVaultsQuery
-            {
-                Organization = organization,
-                SessionToken = sessionToken
-            };
-            var result = sut.Validate(query);
+        result.IsValid.Should().BeFalse();
+        result.Errors.Count.Should().Be(1);
+    }
 
-            result.IsValid.Should().BeFalse();
-            result.Errors.Count.Should().Be(1);
-        }
+    [Theory]
+    [InlineData("appy", "FakeToken")]
+    public void ShouldBeValidWhenAllRequiredPropertiesHaveBeenSet(string organization, string sessionToken)
+    {
+        var sut = new GetOnePasswordVaultsQueryValidator();
 
-        [Theory]
-        [InlineData("appy", "FakeToken")]
-        public void ShouldBeValidWhenAllRequiredPropertiesHaveBeenSet(string organization, string sessionToken)
+        var query = new GetOnePasswordVaultsQuery
         {
-            var sut = new GetOnePasswordVaultsQueryValidator();
+            Organization = organization,
+            SessionToken = sessionToken
+        };
+        var result = sut.Validate(query);
 
-            var query = new GetOnePasswordVaultsQuery
-            {
-                Organization = organization,
-                SessionToken = sessionToken
-            };
-            var result = sut.Validate(query);
-
-            result.IsValid.Should().BeTrue();
-            result.Errors.Should().BeNull();
-        }
+        result.IsValid.Should().BeTrue();
+        result.Errors.Should().BeNull();
     }
 }

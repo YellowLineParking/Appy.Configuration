@@ -1,24 +1,23 @@
 using System.Collections.Generic;
 using Appy.Infrastructure.OnePassword.Model;
 
-namespace Appy.Infrastructure.OnePassword.Queries
+namespace Appy.Infrastructure.OnePassword.Queries;
+
+public class GetOnePasswordNoteQueryResult
 {
-    public class GetOnePasswordNoteQueryResult
+    public string Title { get; set; }
+
+    public IReadOnlyCollection<OnePasswordField>? Fields { get; set; }
+
+    public GetOnePasswordNoteQueryResult WithTitle(string title)
     {
-        public string Title { get; set; }
+        Title = title;
+        return this;
+    }
 
-        public IReadOnlyCollection<OnePasswordField>? Fields { get; set; }
-
-        public GetOnePasswordNoteQueryResult WithTitle(string title)
-        {
-            Title = title;
-            return this;
-        }
-
-        public GetOnePasswordNoteQueryResult WithFields(IReadOnlyCollection<OnePasswordField> fields)
-        {
-            Fields = fields;
-            return this;
-        }
+    public GetOnePasswordNoteQueryResult WithFields(IReadOnlyCollection<OnePasswordField> fields)
+    {
+        Fields = fields;
+        return this;
     }
 }

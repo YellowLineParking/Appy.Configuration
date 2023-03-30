@@ -1,8 +1,8 @@
-#addin nuget:?package=YamlDotNet&version=8.1.2
+#addin nuget:?package=YamlDotNet&version=13.0.2
 #addin nuget:?package=System.Xml.XDocument&version=4.3.0
-#addin nuget:?package=Cake.MinVer&version=1.0.0-rc0001
-#addin nuget:?package=Cake.Yaml&version=3.1.1
-#addin nuget:?package=Cake.Docker&version=0.11.1
+#addin nuget:?package=Cake.MinVer&version=3.0.0
+#addin nuget:?package=Cake.Yaml&version=6.0.0
+#addin nuget:?package=Cake.Docker&version=1.2.0
 
 #load "./functions.cake"
 
@@ -42,7 +42,7 @@ Task("Restore")
     DotNetRestore(basePath,
         new DotNetRestoreSettings
         {
-            Verbosity = DotNetCoreVerbosity.Minimal
+            Verbosity = DotNetVerbosity.Minimal
         });
 });
 
@@ -60,7 +60,7 @@ Task("Build-Project")
             Configuration = configuration,
             NoRestore = true,
             NoIncremental = context.HasArgument("rebuild"),
-            MSBuildSettings = new DotNetCoreMSBuildSettings()
+            MSBuildSettings = new DotNetMSBuildSettings()
                 .TreatAllWarningsAs(MSBuildTreatAllWarningsAs.Error)
         });
     }
@@ -112,7 +112,7 @@ Task("Test")
                 // $"xunit;LogFilePath={MakeAbsolute(artifactsPath).FullPath}/xunit-{projectDescriptor.Config.Name}.xml",
                 "GitHubActions;report-warnings=false"
             },
-            Verbosity = DotNetCoreVerbosity.Quiet
+            Verbosity = DotNetVerbosity.Quiet
         });
     }
 });
@@ -132,7 +132,7 @@ Task("Package")
             NoRestore = true,
             NoBuild = true,
             OutputDirectory = artifactsPath,
-            MSBuildSettings = new DotNetCoreMSBuildSettings()
+            MSBuildSettings = new DotNetMSBuildSettings()
                 .TreatAllWarningsAs(MSBuildTreatAllWarningsAs.Error)
         });
     }

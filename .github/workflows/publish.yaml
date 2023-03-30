@@ -21,34 +21,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
       - name: Cache packages
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ env.NUGET_PACKAGES }}
           key: ${{ runner.os }}-nuget-${{ hashFiles('.config/dotnet-tools.json', '**/packages.lock.json') }}
           restore-keys: ${{ runner.os }}-nuget-
 
-      - name: Setup .NETCore 3.1.402
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 3.1.402
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
 
-      - name: Setup .NET 5.x
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 5.0.100
-
-      - name: Setup .NET 6.x
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 6.0.100
-
-      - name: Docker Hub login
-        uses: docker/login-action@v1
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}

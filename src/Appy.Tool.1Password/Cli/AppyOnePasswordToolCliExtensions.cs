@@ -1,64 +1,63 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Appy.Tool.OnePassword.Cli
-{
-    public static class AppyOnePasswordToolCliExtensions
-    {
-        static void AdaptByOptionValuesCount(List<string> argValues, List<string> argsFixed)
-        {
-            if (argValues.Count == 1)
-            {
-                argsFixed[^1] = $"{argsFixed[^1]}:{string.Join(" ", argValues)}";
-                argValues.Clear();
-            }
+namespace Appy.Tool.OnePassword.Cli;
 
-            if (argValues.Count > 0)
-            {
-                argsFixed[^1] = $"{argsFixed[^1]}:\"{string.Join(" ", argValues)}\"";
-                argValues.Clear();
-            }
+public static class AppyOnePasswordToolCliExtensions
+{
+    static void AdaptByOptionValuesCount(List<string> argValues, List<string> argsFixed)
+    {
+        if (argValues.Count == 1)
+        {
+            argsFixed[^1] = $"{argsFixed[^1]}:{string.Join(" ", argValues)}";
+            argValues.Clear();
         }
 
-        public static IEnumerable<string> EscapeArgs(this string[] args)
+        if (argValues.Count > 0)
         {
-            if (args.Length == 0)
+            argsFixed[^1] = $"{argsFixed[^1]}:\"{string.Join(" ", argValues)}\"";
+            argValues.Clear();
+        }
+    }
+
+    public static IEnumerable<string> EscapeArgs(this string[] args)
+    {
+        if (args.Length == 0)
+        {
+            return args;
+        }
+
+        var argsFixed = new List<string>();
+        var argValues = new List<string>();
+
+        foreach (var arg in args)
+        {
+            if (!arg.StartsWith('-'))
             {
-                return args;
-            }
-
-            var argsFixed = new List<string>();
-            var argValues = new List<string>();
-
-            foreach (var arg in args)
-            {
-                if (!arg.StartsWith('-'))
-                {
-                    argValues.Add(arg);
-                    continue;
-                }
-
-                AdaptByOptionValuesCount(argValues, argsFixed);
-
-                argsFixed.Add(arg);
+                argValues.Add(arg);
+                continue;
             }
 
             AdaptByOptionValuesCount(argValues, argsFixed);
 
-            return argsFixed;
+            argsFixed.Add(arg);
         }
 
-        public static IList<string> SplitBySpaceAndTrimSpaces(this string value)
+        AdaptByOptionValuesCount(argValues, argsFixed);
+
+        return argsFixed;
+    }
+
+    public static IList<string> SplitBySpaceAndTrimSpaces(this string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
         {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return Enumerable.Empty<string>().ToList();
-            }
-
-            return value.Split(' ')
-                .Where(v => !string.IsNullOrWhiteSpace(v))
-                .Select(v => v.Trim('\"', ' '))
-                .ToList();
+            return Enumerable.Empty<string>().ToList();
         }
+
+        return value.Split(' ')
+            .Where(v => !string.IsNullOrWhiteSpace(v))
+            .Select(v => v.Trim('\"', ' '))
+            .ToList();
     }
 }

@@ -1,8 +1,7 @@
-namespace Appy.Tool.OnePassword.Api
+namespace Appy.Tool.OnePassword.Api;
+
+public class OnePasswordApiSettings
 {
-    public class OnePasswordApiSettings
-    {
-        public bool StartWithoutBlocking { get; set; }
-        public int Port { get; set; } = 5500;
-    }
+    public bool StartWithoutBlocking { get; set; }
+    public int Port { get; set; } = 5500;
 }

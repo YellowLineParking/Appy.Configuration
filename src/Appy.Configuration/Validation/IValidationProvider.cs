@@ -1,7 +1,6 @@
-namespace Appy.Configuration.Validation
+namespace Appy.Configuration.Validation;
+
+public interface IValidationProvider
 {
-    public interface IValidationProvider
-    {
-        IValidator<TModel> GetValidator<TModel>();
-    }
+    IValidator<TModel> GetValidator<TModel>();
 }

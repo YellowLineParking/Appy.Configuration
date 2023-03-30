@@ -2,41 +2,40 @@ using System;
 using System.Threading.Tasks;
 using Appy.Infrastructure.OnePassword.ApiClient;
 
-namespace Appy.Infrastructure.OnePassword.Tooling
+namespace Appy.Infrastructure.OnePassword.Tooling;
+
+internal static class RemoteToolExtensions
 {
-    internal static class RemoteToolExtensions
+    internal static async Task<T> UnWrap<T>(this Task<Response<T>> task)
     {
-        internal static async Task<T> UnWrap<T>(this Task<Response<T>> task)
+        string? message;
+        object? exceptionResult = null;
+        Exception innerException = null!;
+
+        try
         {
-            string? message;
-            object? exceptionResult = null;
-            Exception innerException = null!;
+            var response = await task;
 
-            try
+            if (response.Success)
             {
-                var response = await task;
-
-                if (response.Success)
-                {
-                    return response.Result;
-                }
-
-                message = response?.Message!;
-            }
-            catch (OnePasswordApiClientException httpException)
-            {
-                var response = httpException.Response;
-                message = response?.Message;
-                exceptionResult = response;
-                innerException = httpException;
-            }
-            catch (Exception ex)
-            {
-                message = ex.Message;
-                innerException = ex;
+                return response.Result;
             }
 
-            throw new OnePasswordToolException(message!, exceptionResult!, innerException);
+            message = response?.Message!;
         }
+        catch (OnePasswordApiClientException httpException)
+        {
+            var response = httpException.Response;
+            message = response?.Message;
+            exceptionResult = response;
+            innerException = httpException;
+        }
+        catch (Exception ex)
+        {
+            message = ex.Message;
+            innerException = ex;
+        }
+
+        throw new OnePasswordToolException(message!, exceptionResult!, innerException);
     }
 }

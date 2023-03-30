@@ -1,8 +1,7 @@
-namespace Appy.Configuration.Validation
+namespace Appy.Configuration.Validation;
+
+public class ValidationError
 {
-    public class ValidationError
-    {
-        public string Property { get; set; }
-        public string Message { get; set; }
-    }
+    public string Property { get; set; }
+    public string Message { get; set; }
 }

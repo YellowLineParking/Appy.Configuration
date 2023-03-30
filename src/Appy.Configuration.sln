@@ -27,6 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{F90AF1CE
 		..\functions.cake = ..\functions.cake
 		..\config.yml = ..\config.yml
 		..\global.json = ..\global.json
+		..\dotnet-tools.json = ..\dotnet-tools.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{450B3144-2677-4626-AAD1-12C7D3702B83}"
