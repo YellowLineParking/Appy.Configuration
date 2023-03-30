@@ -8,42 +8,41 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 
-namespace Appy.Tool.OnePassword.Tests.Api.Fixtures
+namespace Appy.Tool.OnePassword.Tests.Api.Fixtures;
+
+public class OnePasswordApiTestFixture : WebApplicationFactory<OnePasswordApiStartup>
 {
-    public class OnePasswordApiTestFixture : WebApplicationFactory<OnePasswordApiStartup>
+    ITestOutputHelper _output;
+
+    protected override IWebHostBuilder CreateWebHostBuilder()
     {
-        ITestOutputHelper _output;
+        return OnePasswordApiRunner
+            .CreateHostBuilder()
+            .UseEnvironment(Environments.Development)
+            .ConfigureLogging(logging => logging
+                .ClearProviders()
+                .AddXUnit(_output));
+    }
 
-        protected override IWebHostBuilder CreateWebHostBuilder()
+    public OnePasswordApiTestFixture WithOutput(ITestOutputHelper output)
+    {
+        _output = output;
+        return this;
+    }
+
+    public Action<IServiceCollection> ServicesConfiguration { get; set; }
+
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.ConfigureTestServices(services =>
         {
-            return OnePasswordApiRunner
-                .CreateHostBuilder()
-                .UseEnvironment(Environments.Development)
-                .ConfigureLogging(logging => logging
-                    .ClearProviders()
-                    .AddXUnit(_output));
-        }
+            ServicesConfiguration?.Invoke(services);
+        });
+    }
 
-        public OnePasswordApiTestFixture WithOutput(ITestOutputHelper output)
-        {
-            _output = output;
-            return this;
-        }
-
-        public Action<IServiceCollection> ServicesConfiguration { get; set; }
-
-        protected override void ConfigureWebHost(IWebHostBuilder builder)
-        {
-            builder.ConfigureTestServices(services =>
-            {
-                ServicesConfiguration?.Invoke(services);
-            });
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            _output = null;
-            base.Dispose(disposing);
-        }
+    protected override void Dispose(bool disposing)
+    {
+        _output = null;
+        base.Dispose(disposing);
     }
 }

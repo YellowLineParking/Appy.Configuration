@@ -5,144 +5,143 @@ using Appy.Infrastructure.OnePassword.Tests.Fixtures;
 using FluentAssertions;
 using Xunit;
 
-namespace Appy.Infrastructure.OnePassword.Tests.Storage
+namespace Appy.Infrastructure.OnePassword.Tests.Storage;
+
+public class OnePasswordSessionStorageSelectorTest
 {
-    public class OnePasswordSessionStorageSelectorTest
+    public class GetCurrent
     {
-        public class GetCurrent
+        public class WhenRunningOnWindows
         {
-            public class WhenRunningOnWindows
+            [Fact]
+            public async Task ShouldGetSessionFromEnvSessionStorage()
             {
-                [Fact]
-                public async Task ShouldGetSessionFromEnvSessionStorage()
-                {
-                    var session = AppyOnePasswordSession.New(
-                        organization: "appy",
-                        environment: "DEV",
-                        vault: "Development",
-                        sessionToken: "FakeToken");
+                var session = AppyOnePasswordSession.New(
+                    organization: "appy",
+                    environment: "DEV",
+                    vault: "Development",
+                    sessionToken: "FakeToken");
 
-                    var fixture = new Fixture()
-                        .WithWindowsPlatform()
-                        .WithEnvSessionStorageSession(session);
+                var fixture = new Fixture()
+                    .WithWindowsPlatform()
+                    .WithEnvSessionStorageSession(session);
 
-                    var sut = fixture.CreateSubject();
+                var sut = fixture.CreateSubject();
 
-                    var result = await sut.GetCurrent();
+                var result = await sut.GetCurrent();
 
-                    fixture.FileSessionStorage.VerifyGetNotCalled();
-                    result.Should().BeEquivalentTo(session);
-                }
-            }
-
-            public class WhenNotRunningOnWindowsAndOrganizationIsEmpty
-            {
-                [Fact]
-                public async Task ShouldTryGetSessionFromEnvSessionStorageAndThenFromFileSessionStorage()
-                {
-                    var empty = AppyOnePasswordSession.Empty();
-                    var session = AppyOnePasswordSession.New(
-                        organization: string.Empty,
-                        environment: "DEV",
-                        vault: "Development",
-                        sessionToken: "FakeToken");
-
-                    var fixture = new Fixture()
-                        .WithoutWindowsPlatform()
-                        .WithEnvSessionStorageSession(empty)
-                        .WithFileSessionStorageSession(session);
-
-                    var sut = fixture.CreateSubject();
-
-                    var result = await sut.GetCurrent();
-
-                    result.Should().BeEquivalentTo(session);
-                }
+                fixture.FileSessionStorage.VerifyGetNotCalled();
+                result.Should().BeEquivalentTo(session);
             }
         }
 
-        public class UpdateSession
+        public class WhenNotRunningOnWindowsAndOrganizationIsEmpty
         {
-            public class WhenRunningOnWindows
+            [Fact]
+            public async Task ShouldTryGetSessionFromEnvSessionStorageAndThenFromFileSessionStorage()
             {
-                [Fact]
-                public async Task ShouldUpdateEnvSessionStorage()
-                {
-                    var session = AppyOnePasswordSession.Empty();
+                var empty = AppyOnePasswordSession.Empty();
+                var session = AppyOnePasswordSession.New(
+                    organization: string.Empty,
+                    environment: "DEV",
+                    vault: "Development",
+                    sessionToken: "FakeToken");
 
-                    var fixture = new Fixture()
-                        .WithWindowsPlatform();
+                var fixture = new Fixture()
+                    .WithoutWindowsPlatform()
+                    .WithEnvSessionStorageSession(empty)
+                    .WithFileSessionStorageSession(session);
 
-                    var sut = fixture.CreateSubject();
+                var sut = fixture.CreateSubject();
 
-                    await sut.Update(session);
+                var result = await sut.GetCurrent();
 
-                    fixture.EnvSessionStorage.VerifyUpdateWith(session);
-                    fixture.FileSessionStorage.VerifyUpdateNotCalled();
-                }
+                result.Should().BeEquivalentTo(session);
             }
+        }
+    }
 
-            public class WhenNotRunningOnWindows
+    public class UpdateSession
+    {
+        public class WhenRunningOnWindows
+        {
+            [Fact]
+            public async Task ShouldUpdateEnvSessionStorage()
             {
-                [Fact]
-                public async Task ShouldUpdateFileSessionStorage()
-                {
-                    var session = AppyOnePasswordSession.Empty();
+                var session = AppyOnePasswordSession.Empty();
 
-                    var fixture = new Fixture()
-                        .WithoutWindowsPlatform();
+                var fixture = new Fixture()
+                    .WithWindowsPlatform();
 
-                    var sut = fixture.CreateSubject();
+                var sut = fixture.CreateSubject();
 
-                    await sut.Update(session);
+                await sut.Update(session);
 
-                    fixture.EnvSessionStorage.VerifyUpdateNotCalled();
-                    fixture.FileSessionStorage.VerifyUpdateWith(session);
-                }
+                fixture.EnvSessionStorage.VerifyUpdateWith(session);
+                fixture.FileSessionStorage.VerifyUpdateNotCalled();
             }
         }
 
-        class Fixture
+        public class WhenNotRunningOnWindows
         {
-            public Fixture()
+            [Fact]
+            public async Task ShouldUpdateFileSessionStorage()
             {
-                PlatformInfo = new PlatformInformationMock();
-                FileSessionStorage = new OnePasswordSessionStorageMock();
-                EnvSessionStorage = new OnePasswordSessionStorageMock();
-            }
+                var session = AppyOnePasswordSession.Empty();
 
-            public PlatformInformationMock PlatformInfo { get; }
-            public OnePasswordSessionStorageMock EnvSessionStorage { get; }
-            public OnePasswordSessionStorageMock FileSessionStorage { get; }
+                var fixture = new Fixture()
+                    .WithoutWindowsPlatform();
 
-            public IOnePasswordSessionStorage CreateSubject()
-            {
-                return new OnePasswordSessionStorageSelector(PlatformInfo.Object, EnvSessionStorage.Object, FileSessionStorage.Object);
-            }
+                var sut = fixture.CreateSubject();
 
-            public Fixture WithWindowsPlatform()
-            {
-                PlatformInfo.SetupRunningOnWindows(true);
-                return this;
-            }
+                await sut.Update(session);
 
-            public Fixture WithoutWindowsPlatform()
-            {
-                PlatformInfo.SetupRunningOnWindows(false);
-                return this;
+                fixture.EnvSessionStorage.VerifyUpdateNotCalled();
+                fixture.FileSessionStorage.VerifyUpdateWith(session);
             }
+        }
+    }
 
-            public Fixture WithEnvSessionStorageSession(AppyOnePasswordSession session)
-            {
-                EnvSessionStorage.SetupGetAndReturns(session);
-                return this;
-            }
+    class Fixture
+    {
+        public Fixture()
+        {
+            PlatformInfo = new PlatformInformationMock();
+            FileSessionStorage = new OnePasswordSessionStorageMock();
+            EnvSessionStorage = new OnePasswordSessionStorageMock();
+        }
 
-            public Fixture WithFileSessionStorageSession(AppyOnePasswordSession session)
-            {
-                FileSessionStorage.SetupGetAndReturns(session);
-                return this;
-            }
+        public PlatformInformationMock PlatformInfo { get; }
+        public OnePasswordSessionStorageMock EnvSessionStorage { get; }
+        public OnePasswordSessionStorageMock FileSessionStorage { get; }
+
+        public IOnePasswordSessionStorage CreateSubject()
+        {
+            return new OnePasswordSessionStorageSelector(PlatformInfo.Object, EnvSessionStorage.Object, FileSessionStorage.Object);
+        }
+
+        public Fixture WithWindowsPlatform()
+        {
+            PlatformInfo.SetupRunningOnWindows(true);
+            return this;
+        }
+
+        public Fixture WithoutWindowsPlatform()
+        {
+            PlatformInfo.SetupRunningOnWindows(false);
+            return this;
+        }
+
+        public Fixture WithEnvSessionStorageSession(AppyOnePasswordSession session)
+        {
+            EnvSessionStorage.SetupGetAndReturns(session);
+            return this;
+        }
+
+        public Fixture WithFileSessionStorageSession(AppyOnePasswordSession session)
+        {
+            FileSessionStorage.SetupGetAndReturns(session);
+            return this;
         }
     }
 }

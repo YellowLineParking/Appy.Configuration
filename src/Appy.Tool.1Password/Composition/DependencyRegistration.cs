@@ -13,65 +13,64 @@ using Appy.Tool.OnePassword.Cli;
 using Appy.Tool.OnePassword.Logging;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Appy.Tool.OnePassword.Composition
+namespace Appy.Tool.OnePassword.Composition;
+
+public static class DependencyRegistration
 {
-    public static class DependencyRegistration
+    static IServiceCollection AddCommonDependencies(this IServiceCollection services)
     {
-        static IServiceCollection AddCommonDependencies(this IServiceCollection services)
-        {
-            services
-                .AddSingleton<ILogger, ConsoleLogger>()
-                .AddSingleton<IAppyJsonSerializer, NewtonsoftAppyJsonSerializer>()
-                .AddSingleton<IProcessRunner, DefaultProcessRunner>()
-                .AddSingleton<IEnvironmentAccessor, EnvironmentAccessor>()
-                .AddSingleton<IPlatformInformation, PlatformInformation>()
-                .AddSingleton<OnePasswordEnvironmentSessionStorage>()
-                .AddSingleton<OnePasswordFileSessionStorage>()
-                .AddSingleton<IOnePasswordSessionStorage>(sp => new OnePasswordSessionStorageSelector(
-                    sp.GetService<IPlatformInformation>(),
-                    sp.GetService<OnePasswordEnvironmentSessionStorage>(),
-                    sp.GetService<OnePasswordFileSessionStorage>()))
-                .AddSingleton<IValidationProvider, DefaultValidationProvider>()
-                .AddSingleton<IValidator, DefaultValidator>();
+        services
+            .AddSingleton<ILogger, ConsoleLogger>()
+            .AddSingleton<IAppyJsonSerializer, NewtonsoftAppyJsonSerializer>()
+            .AddSingleton<IProcessRunner, DefaultProcessRunner>()
+            .AddSingleton<IEnvironmentAccessor, EnvironmentAccessor>()
+            .AddSingleton<IPlatformInformation, PlatformInformation>()
+            .AddSingleton<OnePasswordEnvironmentSessionStorage>()
+            .AddSingleton<OnePasswordFileSessionStorage>()
+            .AddSingleton<IOnePasswordSessionStorage>(sp => new OnePasswordSessionStorageSelector(
+                sp.GetService<IPlatformInformation>(),
+                sp.GetService<OnePasswordEnvironmentSessionStorage>(),
+                sp.GetService<OnePasswordFileSessionStorage>()))
+            .AddSingleton<IValidationProvider, DefaultValidationProvider>()
+            .AddSingleton<IValidator, DefaultValidator>();
 
-            services
-                .AddSingleton<IValidator<GetOnePasswordNoteQuery>, GetOnePasswordNoteQueryValidator>()
-                .AddSingleton<IValidator<GetOnePasswordVaultsQuery>, GetOnePasswordVaultsQueryValidator>()
-                .AddSingleton<IValidator<SignInOnePasswordCommand>, SignInOnePasswordCommandValidator>();
+        services
+            .AddSingleton<IValidator<GetOnePasswordNoteQuery>, GetOnePasswordNoteQueryValidator>()
+            .AddSingleton<IValidator<GetOnePasswordVaultsQuery>, GetOnePasswordVaultsQueryValidator>()
+            .AddSingleton<IValidator<SignInOnePasswordCommand>, SignInOnePasswordCommandValidator>();
 
-            return services;
-        }
+        return services;
+    }
 
-        public static IServiceCollection AddToolDependencies(this IServiceCollection services)
-        {
-            services
-                .AddCommonDependencies()
-                .AddSingleton<ICommandLineApplicationFactory, CommandLineApplicationFactory>()
-                .AddSingleton<IJobScheduler, SimpleJobScheduler>()
-                .AddSingleton<IOnePasswordTool>(sp => new OnePasswordLocalTool(
+    public static IServiceCollection AddToolDependencies(this IServiceCollection services)
+    {
+        services
+            .AddCommonDependencies()
+            .AddSingleton<ICommandLineApplicationFactory, CommandLineApplicationFactory>()
+            .AddSingleton<IJobScheduler, SimpleJobScheduler>()
+            .AddSingleton<IOnePasswordTool>(sp => new OnePasswordLocalTool(
                     sp.GetService<ILogger>(),
                     sp.GetService<IAppyJsonSerializer>(),
                     sp.GetService<IProcessRunner>())
-                    .WithValidation(sp.GetService<IValidator>()))
-                .AddSingleton<IAppyOnePasswordToolCli, AppyOnePasswordToolCli>()
-                .AddSingleton<IOnePasswordApiRunner, OnePasswordApiRunner>()
-                .AddSingleton<IConsoleVisualzer, ConsoleVisualizer>();
+                .WithValidation(sp.GetService<IValidator>()))
+            .AddSingleton<IAppyOnePasswordToolCli, AppyOnePasswordToolCli>()
+            .AddSingleton<IOnePasswordApiRunner, OnePasswordApiRunner>()
+            .AddSingleton<IConsoleVisualzer, ConsoleVisualizer>();
 
-            return services;
-        }
+        return services;
+    }
 
-        public static IServiceCollection AddApiDependencies(this IServiceCollection services)
-        {
-            services
-                .AddCommonDependencies()
-                .AddSingleton<IOnePasswordTool>(sp => new OnePasswordLocalTool(
-                        sp.GetService<ILogger>(),
-                        sp.GetService<IAppyJsonSerializer>(),
-                        sp.GetService<IProcessRunner>())
-                        .WithValidation(sp.GetService<IValidator>())
-                        .WithConfiguration(sp.GetService<IOnePasswordSessionStorage>()));
+    public static IServiceCollection AddApiDependencies(this IServiceCollection services)
+    {
+        services
+            .AddCommonDependencies()
+            .AddSingleton<IOnePasswordTool>(sp => new OnePasswordLocalTool(
+                    sp.GetService<ILogger>(),
+                    sp.GetService<IAppyJsonSerializer>(),
+                    sp.GetService<IProcessRunner>())
+                .WithValidation(sp.GetService<IValidator>())
+                .WithConfiguration(sp.GetService<IOnePasswordSessionStorage>()));
 
-            return services;
-        }
+        return services;
     }
 }

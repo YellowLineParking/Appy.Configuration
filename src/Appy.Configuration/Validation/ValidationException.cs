@@ -1,20 +1,19 @@
 using System;
 
-namespace Appy.Configuration.Validation
+namespace Appy.Configuration.Validation;
+
+public class ValidationException : Exception
 {
-    public class ValidationException : Exception
+    public ValidationResult Result { get; }
+
+    public ValidationException(string message, ValidationResult result)
+        : base(message)
     {
-        public ValidationResult Result { get; }
+        Result = result;
+    }
 
-        public ValidationException(string message, ValidationResult result)
-            : base(message)
-        {
-            Result = result;
-        }
-
-        public ValidationException(ValidationResult result)
-        {
-            Result = result;
-        }
+    public ValidationException(ValidationResult result)
+    {
+        Result = result;
     }
 }

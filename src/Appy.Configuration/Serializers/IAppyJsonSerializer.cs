@@ -1,8 +1,7 @@
-namespace Appy.Configuration.Serializers
+namespace Appy.Configuration.Serializers;
+
+public interface IAppyJsonSerializer
 {
-    public interface IAppyJsonSerializer
-    {
-        string Serialize(object value);
-        T Deserialize<T>(string value);
-    }
+    string Serialize(object value);
+    T Deserialize<T>(string value);
 }

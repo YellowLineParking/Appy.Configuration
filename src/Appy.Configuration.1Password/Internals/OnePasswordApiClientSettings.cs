@@ -1,7 +1,6 @@
-namespace Appy.Configuration.OnePassword.Internals
+namespace Appy.Configuration.OnePassword.Internals;
+
+internal class OnePasswordApiClientSettings
 {
-    internal class OnePasswordApiClientSettings
-    {
-        public string Uri { get; set; }
-    }
+    public string Uri { get; set; }
 }

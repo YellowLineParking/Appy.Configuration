@@ -1,12 +1,11 @@
 using McMaster.Extensions.CommandLineUtils;
 
-namespace Appy.Tool.OnePassword.Cli
+namespace Appy.Tool.OnePassword.Cli;
+
+public class CommandLineApplicationFactory : ICommandLineApplicationFactory
 {
-    public class CommandLineApplicationFactory : ICommandLineApplicationFactory
+    public CommandLineApplication Create(string name, string fullName)
     {
-        public CommandLineApplication Create(string name, string fullName)
-        {
-            return new CommandLineApplication { Name = name, FullName = fullName};
-        }
+        return new CommandLineApplication { Name = name, FullName = fullName};
     }
 }

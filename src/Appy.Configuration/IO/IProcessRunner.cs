@@ -1,9 +1,8 @@
 using System.Threading.Tasks;
 
-namespace Appy.Configuration.IO
+namespace Appy.Configuration.IO;
+
+public interface IProcessRunner
 {
-    public interface IProcessRunner
-    {
-        Task<ProcessResult> Run(string toolPath, ProcessSettings settings);
-    }
+    Task<ProcessResult> Run(string toolPath, ProcessSettings settings);
 }

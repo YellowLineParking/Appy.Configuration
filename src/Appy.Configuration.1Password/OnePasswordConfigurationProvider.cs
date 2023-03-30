@@ -4,63 +4,62 @@ using System.Threading.Tasks;
 using Appy.Infrastructure.OnePassword.Queries;
 using Microsoft.Extensions.Configuration;
 
-namespace Appy.Configuration.OnePassword
+namespace Appy.Configuration.OnePassword;
+
+/// <summary>
+/// Configuration provider for 1Password
+/// </summary>
+public class OnePasswordConfigurationProvider : ConfigurationProvider
 {
+    readonly OnePasswordConfigurationSource _source;
+
     /// <summary>
-    /// Configuration provider for 1Password
+    /// Creates a configuration provider for 1Password.
     /// </summary>
-    public class OnePasswordConfigurationProvider : ConfigurationProvider
+    /// <param name="source">The source settings.</param>
+    public OnePasswordConfigurationProvider(OnePasswordConfigurationSource source)
     {
-        readonly OnePasswordConfigurationSource _source;
+        _source = source ?? throw new ArgumentNullException(nameof(source));
+    }
 
-        /// <summary>
-        /// Creates a configuration provider for 1Password.
-        /// </summary>
-        /// <param name="source">The source settings.</param>
-        public OnePasswordConfigurationProvider(OnePasswordConfigurationSource source)
+    public override void Load() => LoadAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+
+    async Task LoadAsync()
+    {
+        var appSettingsName = $"{_source.AppName}.AppSettings";
+
+        var query = new GetOnePasswordNoteQuery
         {
-            _source = source ?? throw new ArgumentNullException(nameof(source));
+            Organization = _source.Organization,
+            Item = appSettingsName,
+            Vault = _source.Vault,
+            Environment = _source.Environment,
+            SessionToken = _source.SessionToken
+        };
+
+        var result = await _source.Tool.Execute(query);
+
+        var data = new Dictionary<string, string>();
+
+        if (result?.Fields == null)
+        {
+            throw new OnePasswordConfigurationException($"1Password {query.Environment} environment section fields cannot be empty");
         }
 
-        public override void Load() => LoadAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-
-        async Task LoadAsync()
+        foreach (var field in result.Fields)
         {
-            var appSettingsName = $"{_source.AppName}.AppSettings";
-
-            var query = new GetOnePasswordNoteQuery
+            if (string.IsNullOrWhiteSpace(field.Name))
             {
-                Organization = _source.Organization,
-                Item = appSettingsName,
-                Vault = _source.Vault,
-                Environment = _source.Environment,
-                SessionToken = _source.SessionToken
-            };
-
-            var result = await _source.Tool.Execute(query);
-
-            var data = new Dictionary<string, string>();
-
-            if (result?.Fields == null)
+                throw new OnePasswordConfigurationException($"1Password {query.Environment} environment section fields name cannot be empty");
+            }
+            if (string.IsNullOrWhiteSpace(field.Value))
             {
-                throw new OnePasswordConfigurationException($"1Password {query.Environment} environment section fields cannot be empty");
+                throw new OnePasswordConfigurationException($"1Password {query.Environment} environment section field '{field.Name}' value cannot be empty");
             }
 
-            foreach (var field in result.Fields)
-            {
-                if (string.IsNullOrWhiteSpace(field.Name))
-                {
-                    throw new OnePasswordConfigurationException($"1Password {query.Environment} environment section fields name cannot be empty");
-                }
-                if (string.IsNullOrWhiteSpace(field.Value))
-                {
-                    throw new OnePasswordConfigurationException($"1Password {query.Environment} environment section field '{field.Name}' value cannot be empty");
-                }
-
-                data[field.Name!] = field.Value!;
-            }
-
-            Data = data;
+            data[field.Name!] = field.Value!;
         }
+
+        Data = data!;
     }
 }

@@ -1,9 +1,9 @@
-FROM mcr.microsoft.com/dotnet/aspnet:6.0-bullseye-slim AS base
+FROM mcr.microsoft.com/dotnet/aspnet:7.0-bullseye-slim AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0-bullseye-slim AS build
 
 ARG configuration=Release
 
@@ -27,7 +27,7 @@ RUN dotnet publish "Appy.Tool.1Password.csproj" -c $configuration -o /app/publis
 
 FROM base AS final
 # Install 1Password CLI (op)
-ENV OP_VERSION 1.12.3
+ENV OP_VERSION 1.12.5
 RUN buildDeps="curl gnupg dirmngr unzip" \
     && runDeps="ca-certificates" \
     && apt-get update \
@@ -46,6 +46,6 @@ COPY --from=publish /app/publish .
 
 ENTRYPOINT ["dotnet", "Appy.Tool.1Password.dll"]
 
-# docker build . -f src/Appy.Tool.1Password/Dockerfile -t appy-op:0.6.1
-# docker run --rm -it -e "HOME=$HOME" -v "$HOME:$HOME" -p 6000:6000 --name appytest appy-op:0.6.0 -s -vt Development -env DEV -a -api 6000
+# docker build . -f src/Appy.Tool.1Password/Dockerfile -t appy-op:0.10.0
+# docker run --rm -it -e "HOME=$HOME" -v "$HOME:$HOME" -p 6000:6000 --name appytest appy-op:0.10.0 -s -vt Development -env DEV -a -api 6000
 

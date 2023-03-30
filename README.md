@@ -4,7 +4,7 @@
 
 ## What is Appy.Configuration?
 
-Configuration providers for NETCore 3.1, NET 5.0 and NET6.0.
+Configuration providers for Dotnet.
 
 The latest supported version of 1Password CLI is 1.12.5.
 

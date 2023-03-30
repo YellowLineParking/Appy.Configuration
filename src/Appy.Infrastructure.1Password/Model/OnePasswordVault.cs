@@ -1,7 +1,6 @@
-namespace Appy.Infrastructure.OnePassword.Model
+namespace Appy.Infrastructure.OnePassword.Model;
+
+public class OnePasswordVault
 {
-    public class OnePasswordVault
-    {
-        public string Name { get; set; }
-    }
+    public string Name { get; set; }
 }

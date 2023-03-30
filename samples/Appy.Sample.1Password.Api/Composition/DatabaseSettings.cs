@@ -1,7 +1,6 @@
-namespace Appy.Sample.OnePassword.Api.Composition
+namespace Appy.Sample.OnePassword.Api.Composition;
+
+public class DatabaseSettings
 {
-    public class DatabaseSettings
-    {
-        public string ConnectionString { get; set; }
-    }
+    public string ConnectionString { get; set; }
 }

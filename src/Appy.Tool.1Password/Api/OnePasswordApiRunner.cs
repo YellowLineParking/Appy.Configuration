@@ -4,60 +4,59 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Appy.Tool.OnePassword.Api
+namespace Appy.Tool.OnePassword.Api;
+
+public class OnePasswordApiRunner : IOnePasswordApiRunner
 {
-    public class OnePasswordApiRunner : IOnePasswordApiRunner
+    IWebHost _webHost;
+
+    public static IWebHostBuilder CreateHostBuilder()
     {
-        IWebHost _webHost;
-
-        public static IWebHostBuilder CreateHostBuilder()
-        {
-            return new WebHostBuilder()
-                .UseKestrel()
-                .ConfigureLogging(logging =>
-                {
-                    logging.ClearProviders();
-                    logging.SetMinimumLevel(LogLevel.Warning);
-                    logging.SetMinimumLevel(LogLevel.None);
-                })
-                .SuppressStatusMessages(true)
-                .UseEnvironment(Environments.Production)
-                .UseStartup<OnePasswordApiStartup>();
-        }
-
-        public void Start(OnePasswordApiSettings settings)
-        {
-            if (IsRunning())
+        return new WebHostBuilder()
+            .UseKestrel()
+            .ConfigureLogging(logging =>
             {
-                throw new Exception("OnePassword Api already started");
-            }
+                logging.ClearProviders();
+                logging.SetMinimumLevel(LogLevel.Warning);
+                logging.SetMinimumLevel(LogLevel.None);
+            })
+            .SuppressStatusMessages(true)
+            .UseEnvironment(Environments.Production)
+            .UseStartup<OnePasswordApiStartup>();
+    }
 
-            _webHost = CreateHostBuilder()
-                .UseUrls($"http://*:{settings.Port}")
-                .Build();
-
-            if (!settings.StartWithoutBlocking)
-            {
-                _webHost.Run();
-                return;
-            }
-
-            var _ = _webHost.RunAsync();
-        }
-
-        public bool IsRunning()
+    public void Start(OnePasswordApiSettings settings)
+    {
+        if (IsRunning())
         {
-            return _webHost != null;
+            throw new Exception("OnePassword Api already started");
         }
 
-        public Task Stop()
+        _webHost = CreateHostBuilder()
+            .UseUrls($"http://*:{settings.Port}")
+            .Build();
+
+        if (!settings.StartWithoutBlocking)
         {
-            if (!IsRunning())
-            {
-                return Task.CompletedTask;
-            }
-
-            return _webHost.StopAsync();
+            _webHost.Run();
+            return;
         }
+
+        var _ = _webHost.RunAsync();
+    }
+
+    public bool IsRunning()
+    {
+        return _webHost != null;
+    }
+
+    public Task Stop()
+    {
+        if (!IsRunning())
+        {
+            return Task.CompletedTask;
+        }
+
+        return _webHost.StopAsync();
     }
 }

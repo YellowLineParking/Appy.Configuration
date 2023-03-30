@@ -1,7 +1,6 @@
-namespace Appy.Infrastructure.OnePassword.ApiClient
+namespace Appy.Infrastructure.OnePassword.ApiClient;
+
+public interface IOnePasswordApiClientFactory
 {
-    public interface IOnePasswordApiClientFactory
-    {
-        OnePasswordApiClient Create();
-    }
+    OnePasswordApiClient Create();
 }

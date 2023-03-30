@@ -2,30 +2,29 @@ using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Appy.Configuration.Serializers
+namespace Appy.Configuration.Serializers;
+
+public class NewtonsoftAppyJsonSerializer : IAppyJsonSerializer
 {
-    public class NewtonsoftAppyJsonSerializer : IAppyJsonSerializer
-    {
-        readonly JsonSerializerSettings _defaultSettings;
+    readonly JsonSerializerSettings _defaultSettings;
 
-        public NewtonsoftAppyJsonSerializer()
-            : this(new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore,
-                ContractResolver = new DefaultContractResolver
-                {
-                    NamingStrategy = new CamelCaseNamingStrategy()
-                }
-            })
-        { }
-
-        public NewtonsoftAppyJsonSerializer(JsonSerializerSettings settings)
+    public NewtonsoftAppyJsonSerializer()
+        : this(new JsonSerializerSettings
         {
-            _defaultSettings = settings ?? throw new ArgumentNullException(nameof(settings));
-        }
+            NullValueHandling = NullValueHandling.Ignore,
+            ContractResolver = new DefaultContractResolver
+            {
+                NamingStrategy = new CamelCaseNamingStrategy()
+            }
+        })
+    { }
 
-        public string Serialize(object value) => JsonConvert.SerializeObject(value, Newtonsoft.Json.Formatting.Indented, _defaultSettings);
-
-        public T Deserialize<T>(string value) => JsonConvert.DeserializeObject<T>(value, _defaultSettings)!;
+    public NewtonsoftAppyJsonSerializer(JsonSerializerSettings settings)
+    {
+        _defaultSettings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
+
+    public string Serialize(object value) => JsonConvert.SerializeObject(value, Newtonsoft.Json.Formatting.Indented, _defaultSettings);
+
+    public T Deserialize<T>(string value) => JsonConvert.DeserializeObject<T>(value, _defaultSettings)!;
 }

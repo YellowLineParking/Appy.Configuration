@@ -1,9 +1,8 @@
-namespace Appy.Configuration.Common
+namespace Appy.Configuration.Common;
+
+public interface IPlatformInformation
 {
-    public interface IPlatformInformation
-    {
-        bool IsRunningOnWindows();
-        bool IsRunningOnMacOS();
-        bool IsRunningOnLinux();
-    }
+    bool IsRunningOnWindows();
+    bool IsRunningOnMacOS();
+    bool IsRunningOnLinux();
 }

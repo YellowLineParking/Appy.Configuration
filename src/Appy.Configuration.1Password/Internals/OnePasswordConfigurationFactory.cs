@@ -3,21 +3,20 @@ using Appy.Configuration.Common;
 using Appy.Infrastructure.OnePassword.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Appy.Configuration.OnePassword.Internals
+namespace Appy.Configuration.OnePassword.Internals;
+
+internal static class OnePasswordConfigurationFactory
 {
-    internal static class OnePasswordConfigurationFactory
+    internal static IServiceProvider BuildServiceProvider()
     {
-        internal static IServiceProvider BuildServiceProvider()
+        var onePasswordApiClientSettings = new OnePasswordApiClientSettings
         {
-            var onePasswordApiClientSettings = new OnePasswordApiClientSettings
-            {
-                Uri = EnvironmentUtils.GetProcessEnvironmentVariable(KnownSessionVars.OnePasswordApiUri)
-            };
+            Uri = EnvironmentUtils.GetProcessEnvironmentVariable(KnownSessionVars.OnePasswordApiUri)
+        };
 
-            var serviceCollection = new ServiceCollection()
-                .AddConfigurationDependencies(onePasswordApiClientSettings);
+        var serviceCollection = new ServiceCollection()
+            .AddConfigurationDependencies(onePasswordApiClientSettings);
 
-            return serviceCollection.BuildServiceProvider();
-        }
+        return serviceCollection.BuildServiceProvider();
     }
 }

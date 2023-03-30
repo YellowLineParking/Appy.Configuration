@@ -1,7 +1,6 @@
-namespace Appy.Configuration.Common
+namespace Appy.Configuration.Common;
+
+public static class ObjectExtensions
 {
-    public static class ObjectExtensions
-    {
-        public static bool IsNull(this object source) => ReferenceEquals(source, null);
-    }
+    public static bool IsNull(this object source) => ReferenceEquals(source, null);
 }
