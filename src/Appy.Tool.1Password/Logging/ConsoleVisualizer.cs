@@ -18,6 +18,7 @@ internal class ConsoleVisualizer : IConsoleVisualzer
             .AddColumn(new TableColumn(string.Empty))
             .AddColumn(new TableColumn(string.Empty))
             .AddRow(nameof(AppyOnePasswordSession.Organization), session.Organization!)
+            .AddRow(nameof(AppyOnePasswordSession.UserId), session.UserId!)
             .AddRow(nameof(AppyOnePasswordSession.Vault), session.Vault!)
             .AddRow(nameof(AppyOnePasswordSession.Environment), session.Environment!)
             .AddRow(nameof(AppyOnePasswordSession.SessionToken), session.SessionToken!)

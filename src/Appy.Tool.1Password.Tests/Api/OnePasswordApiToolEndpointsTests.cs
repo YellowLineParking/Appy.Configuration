@@ -33,7 +33,7 @@ public static class OnePasswordApiToolEndpointsTests
         [Fact]
         public async Task ShouldBeSuccessfulResponse()
         {
-            var expected = new GetOnePasswordNoteQueryResult()
+            var expected = new FetchOnePasswordNoteQueryResult()
                 .WithTitle("DEV")
                 .WithFields(new List<OnePasswordField>()
                     .AddItem(OnePasswordField.New("TestName", "TestValue")));
@@ -145,6 +145,7 @@ public static class OnePasswordApiToolEndpointsTests
     {
         readonly OnePasswordApiTestFixture _apiTestFixture;
         public string Organization { get; }
+        public string UserId { get; }
         public string Environment { get; }
         public string Vault { get; }
         public string Item { get; }
@@ -162,6 +163,7 @@ public static class OnePasswordApiToolEndpointsTests
                 new OnePasswordApiTestClientFactory(_apiTestFixture.CreateClient(), new NewtonsoftAppyJsonSerializer()));
 
             Organization = "appy";
+            UserId = "testUserId";
             Environment = "DEV";
             Vault = "Development";
             Item = "Demo.AppSettings";
@@ -172,7 +174,7 @@ public static class OnePasswordApiToolEndpointsTests
 
         public IOnePasswordTool RemoteTool { get; }
 
-        public Fixture WithNoteQueryResult(GetOnePasswordNoteQueryResult result)
+        public Fixture WithNoteQueryResult(FetchOnePasswordNoteQueryResult result)
         {
             LocalTool.SetupAndReturns(result);
             return this;
@@ -190,16 +192,13 @@ public static class OnePasswordApiToolEndpointsTests
             return this;
         }
 
-        public GetOnePasswordNoteQuery CreateInvalidOnePasswordNoteQuery()
-        {
-            return new GetOnePasswordNoteQuery();
-        }
+        public FetchOnePasswordNoteQuery CreateInvalidOnePasswordNoteQuery() => new();
 
-        public GetOnePasswordNoteQuery CreateValidOnePasswordNoteQuery()
+        public FetchOnePasswordNoteQuery CreateValidOnePasswordNoteQuery()
         {
-            return new GetOnePasswordNoteQuery
+            return new FetchOnePasswordNoteQuery
             {
-                Organization = Organization,
+                UserId = UserId,
                 Environment = Environment,
                 Vault = Vault,
                 Item = Item,

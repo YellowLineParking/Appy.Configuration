@@ -18,6 +18,7 @@ public class OnePasswordSessionStorageSelectorTest
             {
                 var session = AppyOnePasswordSession.New(
                     organization: "appy",
+                    userId: "testUserId",
                     environment: "DEV",
                     vault: "Development",
                     sessionToken: "FakeToken");
@@ -43,6 +44,7 @@ public class OnePasswordSessionStorageSelectorTest
                 var empty = AppyOnePasswordSession.Empty();
                 var session = AppyOnePasswordSession.New(
                     organization: string.Empty,
+                    userId: string.Empty,
                     environment: "DEV",
                     vault: "Development",
                     sessionToken: "FakeToken");

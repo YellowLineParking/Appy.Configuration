@@ -23,11 +23,11 @@ public class DefaultProcessRunner : IProcessRunner
                 options.EnvironmentVariables(settings.EnvironmentVariables);
             }
 
-            options.StartInfo(pinfo =>
+            options.StartInfo(pInfo =>
             {
-                pinfo.RedirectStandardInput = settings.RedirectStandardInput;
-                pinfo.CreateNoWindow = settings.CreateNoWindow;
-                pinfo.UseShellExecute = settings.UseShellExecute;
+                pInfo.RedirectStandardInput = settings.RedirectStandardInput;
+                pInfo.CreateNoWindow = settings.CreateNoWindow;
+                pInfo.UseShellExecute = settings.UseShellExecute;
             });
         });
 

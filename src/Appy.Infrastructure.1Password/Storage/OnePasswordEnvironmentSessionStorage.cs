@@ -24,6 +24,7 @@ public class OnePasswordEnvironmentSessionStorage: IOnePasswordSessionStorage
         {
             return Task.FromResult(AppyOnePasswordSession.New(
                 organization: _envAccessor.GetUserEnvironmentVariable(KnownSessionVars.OnePasswordOrganization),
+                userId: _envAccessor.GetUserEnvironmentVariable(KnownSessionVars.OnePasswordUserId),
                 environment: _envAccessor.GetUserEnvironmentVariable(KnownSessionVars.OnePasswordEnvironment),
                 sessionToken: _envAccessor.GetUserEnvironmentVariable(KnownSessionVars.OnePasswordSessionToken),
                 vault: _envAccessor.GetUserEnvironmentVariable(KnownSessionVars.OnePasswordVault)
@@ -32,6 +33,7 @@ public class OnePasswordEnvironmentSessionStorage: IOnePasswordSessionStorage
 
         return Task.FromResult(AppyOnePasswordSession.New(
             organization: _envAccessor.GetProcessEnvironmentVariable(KnownSessionVars.OnePasswordOrganization),
+            userId: _envAccessor.GetProcessEnvironmentVariable(KnownSessionVars.OnePasswordUserId),
             environment: _envAccessor.GetProcessEnvironmentVariable(KnownSessionVars.OnePasswordEnvironment),
             sessionToken: _envAccessor.GetProcessEnvironmentVariable(KnownSessionVars.OnePasswordSessionToken),
             vault: _envAccessor.GetProcessEnvironmentVariable(KnownSessionVars.OnePasswordVault)
@@ -47,11 +49,13 @@ public class OnePasswordEnvironmentSessionStorage: IOnePasswordSessionStorage
 
         if (session == null) throw new ArgumentException("1Password Session should not be null.");
         if (string.IsNullOrWhiteSpace(session.Organization)) throw new ArgumentException("1Password Organization must be specified.");
+        if (string.IsNullOrWhiteSpace(session.UserId)) throw new ArgumentException("1Password User Id must be specified.");
         if (string.IsNullOrWhiteSpace(session.Environment)) throw new ArgumentException("1Password Environment must be specified.");
         if (string.IsNullOrWhiteSpace(session.Vault)) throw new ArgumentException("1Password Vault must be specified.");
         if (string.IsNullOrWhiteSpace(session.SessionToken)) throw new ArgumentException("1Password SessionToken must be specified.");
 
         _envAccessor.SetUserEnvironmentVariable(KnownSessionVars.OnePasswordOrganization, session.Organization);
+        _envAccessor.SetUserEnvironmentVariable(KnownSessionVars.OnePasswordUserId, session.UserId);
         _envAccessor.SetUserEnvironmentVariable(KnownSessionVars.OnePasswordEnvironment, session.Environment);
         _envAccessor.SetUserEnvironmentVariable(KnownSessionVars.OnePasswordVault, session.Vault);
         _envAccessor.SetUserEnvironmentVariable(KnownSessionVars.OnePasswordSessionToken, session.SessionToken);

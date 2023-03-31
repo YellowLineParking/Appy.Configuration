@@ -21,7 +21,7 @@ public static class OnePasswordConfigurationExtensions
     /// </summary>
     /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
     /// <param name="appName">App name pre-configured on 1Password like "appName.AppSettings" and as a secure note</param>
-    /// <param name="organization">1Password organization name</param>
+    /// <param name="userId">1Password user id</param>
     /// <param name="vault">1Password organization vault</param>
     /// <param name="environment">Execution environment to load from the 1Password Note sections.</param>
     /// <param name="sessionToken">1Password Session Token. The session will last 30 min after you signin with the command line tool.</param>
@@ -30,7 +30,7 @@ public static class OnePasswordConfigurationExtensions
     public static IConfigurationBuilder Add1Password(
         this IConfigurationBuilder builder,
         string appName,
-        string organization,
+        string userId,
         string vault,
         string environment,
         string sessionToken,
@@ -43,7 +43,7 @@ public static class OnePasswordConfigurationExtensions
         var source = new OnePasswordConfigurationSource(
             tool,
             appName,
-            organization,
+            userId,
             vault,
             environment,
             sessionToken);
@@ -59,7 +59,7 @@ public static class OnePasswordConfigurationExtensions
     /// - AppName: Identifies the application where to load the settings. A secure note is expected to exist
     /// in 1Password with a name of the form "appName.AppSettings". Inside this there should be a section
     /// for each environment with the settings. Each setting should be like eg: "Database:ConnectionString".
-    /// - Organization: The organization in 1Password to use will depend on what was previously configured with the console tool.
+    /// - UserId: The user id in the 1Password organization that was previously configured with the console tool.
     /// - Vault: The vault to use will depend on what was previously configured with the console tool.
     /// - Environment: The environment to be loaded will depend on what was previously configured with the console tool.
     /// - Session Token: The environment to be loaded will depend on what was previously configured with the console tool.
@@ -81,7 +81,7 @@ public static class OnePasswordConfigurationExtensions
 
         return builder.Add1Password(
             appName: appName,
-            organization: session.Organization!,
+            userId: session.UserId!,
             vault: session.Vault!,
             environment: session.Environment!,
             sessionToken: session.SessionToken!,

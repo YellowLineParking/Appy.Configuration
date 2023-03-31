@@ -27,13 +27,13 @@ RUN dotnet publish "Appy.Tool.1Password.csproj" -c $configuration -o /app/publis
 
 FROM base AS final
 # Install 1Password CLI (op)
-ENV OP_VERSION 1.12.5
+ENV OP_VERSION 2.16.1
 RUN buildDeps="curl gnupg dirmngr unzip" \
     && runDeps="ca-certificates" \
     && apt-get update \
     && apt-get install -y --no-install-recommends $runDeps $buildDeps \
     && cd /root \
-    && curl -sSL -o op.zip https://cache.agilebits.com/dist/1P/op/pkg/v$OP_VERSION/op_linux_amd64_v$OP_VERSION.zip \
+    && curl -sSL -o op.zip https://cache.agilebits.com/dist/1P/op2/pkg/v$OP_VERSION/op_linux_amd64_v$OP_VERSION.zip \
     && unzip op.zip \
     && gpg --keyserver hkp://keyserver.ubuntu.com --receive-keys 3FEF9748469ADBE15DA7CA80AC2D62742012EA22 \
     && gpg --verify op.sig op \
@@ -46,6 +46,6 @@ COPY --from=publish /app/publish .
 
 ENTRYPOINT ["dotnet", "Appy.Tool.1Password.dll"]
 
-# docker build . -f src/Appy.Tool.1Password/Dockerfile -t appy-op:0.10.0
-# docker run --rm -it -e "HOME=$HOME" -v "$HOME:$HOME" -p 6000:6000 --name appytest appy-op:0.10.0 -s -vt Development -env DEV -a -api 6000
+# docker build . -f src/Appy.Tool.1Password/Dockerfile -t appy-op:1.0.0
+# docker run --rm -it -e "HOME=$HOME" -v "$HOME:$HOME" -p 6000:6000 --name appytest appy-op:1.0.0 -s -vt Development -env DEV -a -api 6000
 

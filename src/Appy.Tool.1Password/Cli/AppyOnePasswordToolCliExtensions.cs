@@ -48,7 +48,7 @@ public static class AppyOnePasswordToolCliExtensions
         return argsFixed;
     }
 
-    public static IList<string> SplitBySpaceAndTrimSpaces(this string value)
+    public static IReadOnlyList<string> SplitBySpaceAndTrimSpaces(this string value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {

@@ -21,9 +21,9 @@ public class OnePasswordApiClient
         _jsonSerializer = jsonSerializer;
     }
 
-    public virtual Task<Response<GetOnePasswordNoteQueryResult>> Execute(GetOnePasswordNoteQuery query, CancellationToken cancellationToken = default)
+    public virtual Task<Response<FetchOnePasswordNoteQueryResult>> Execute(FetchOnePasswordNoteQuery query, CancellationToken cancellationToken = default)
     {
-        return PostJsonAsync<GetOnePasswordNoteQueryResult>("queries/getOnePasswordNote", query, cancellationToken);
+        return PostJsonAsync<FetchOnePasswordNoteQueryResult>("queries/fetchOnePasswordNote", query, cancellationToken);
     }
 
     async Task<Response<TResponse>> PostJsonAsync<TResponse>(string url, object request, CancellationToken cancellationToken)

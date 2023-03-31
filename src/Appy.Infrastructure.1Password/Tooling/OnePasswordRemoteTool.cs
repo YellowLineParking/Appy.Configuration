@@ -16,12 +16,12 @@ public class OnePasswordRemoteTool: IOnePasswordTool
         _apiClientFactory = apiClientFactory ?? throw new ArgumentNullException(nameof(apiClientFactory));
     }
 
-    public Task<GetOnePasswordNoteQueryResult> Execute(GetOnePasswordNoteQuery query, CancellationToken cancellationToken = default(CancellationToken))
+    public Task<FetchOnePasswordNoteQueryResult> Execute(FetchOnePasswordNoteQuery query, CancellationToken cancellationToken = default(CancellationToken))
     {
         return _apiClientFactory.Create().Execute(query, cancellationToken).UnWrap();
     }
 
-    public Task<GetOnePasswordVaultsQueryResult> Execute(GetOnePasswordVaultsQuery query, CancellationToken cancellationToken = default)
+    public Task<FetchOnePasswordVaultsQueryResult> Execute(FetchOnePasswordVaultsQuery query, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException("Available only in the local version.");
     }

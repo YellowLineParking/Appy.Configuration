@@ -19,7 +19,7 @@ builder.Configuration
         // 1.1  Load 1Password settings for the environment with the values manually set for this session:
         //builder.Configuration.Add1Password(
         //    appName: "Appy.Sample.1Password.Api",
-        //    organization: "appyway",
+        //    shorthand: "appyway",
         //    vault: "Development",
         //    environment: "QA",
         //    sessionToken: "1Password session token obtained with the command line");
