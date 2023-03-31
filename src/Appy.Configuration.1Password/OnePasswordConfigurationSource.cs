@@ -14,14 +14,14 @@ public class OnePasswordConfigurationSource : IConfigurationSource
     /// </summary>
     /// <param name="tool">The <see cref="IOnePasswordTool"/> to use.</param>
     /// <param name="appName">App name pre-configured on 1Password like "appName.AppSettings" and as a secure note</param>
-    /// <param name="organization">1Password organization name</param>
+    /// <param name="userId">1Password user id</param>
     /// <param name="vault">1Password organization vault</param>
     /// <param name="environment">Execution environment to load from the 1Password note section.</param>
     /// <param name="sessionToken">1Password Session Token. The session will last 30 min after you signin with the command line tool.</param>
     public OnePasswordConfigurationSource(
         IOnePasswordTool tool,
         string appName,
-        string organization,
+        string userId,
         string vault,
         string environment,
         string sessionToken)
@@ -31,7 +31,7 @@ public class OnePasswordConfigurationSource : IConfigurationSource
         if (string.IsNullOrWhiteSpace(appName)) throw new ArgumentException("1Password App name must be specified", nameof(appName));
 
         AppName = appName;
-        Organization = organization;
+        UserId = userId;
         Vault = vault;
         Environment = environment;
         SessionToken = sessionToken;
@@ -47,9 +47,9 @@ public class OnePasswordConfigurationSource : IConfigurationSource
     public string AppName { get; }
 
     /// <summary>
-    /// 1Password organization name (eg: https://yourorg.1password.com/)
+    /// 1Password user id
     /// </summary>
-    public string Organization { get; }
+    public string UserId { get; }
 
     /// <summary>
     /// 1Password organization vault (eg: Development)

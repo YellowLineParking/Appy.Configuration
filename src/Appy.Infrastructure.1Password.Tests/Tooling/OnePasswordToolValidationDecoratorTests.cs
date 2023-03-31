@@ -12,16 +12,16 @@ namespace Appy.Infrastructure.OnePassword.Tests.Tooling;
 
 public class OnePasswordToolValidationDecoratorTests
 {
-    public class GetOnePasswordNoteQueryTests
+    public class FetchOnePasswordNoteQueryTests
     {
         public class WhenExecuteInvalidQuery
         {
             [Fact]
             public async Task ShouldValidateAndThrow()
             {
-                var fixture = new Fixture().WithInvalidValidationResult<GetOnePasswordNoteQuery>();
+                var fixture = new Fixture().WithInvalidValidationResult<FetchOnePasswordNoteQuery>();
 
-                var query = new GetOnePasswordNoteQuery();
+                var query = new FetchOnePasswordNoteQuery();
 
                 var sut = fixture.CreateSubject();
 
@@ -36,11 +36,11 @@ public class OnePasswordToolValidationDecoratorTests
             [Fact]
             public async Task ShouldValidateAndCallInnerTool()
             {
-                var fixture = new Fixture().WithValidValidationResult<GetOnePasswordNoteQuery>();
+                var fixture = new Fixture().WithValidValidationResult<FetchOnePasswordNoteQuery>();
 
-                var query = new GetOnePasswordNoteQuery
+                var query = new FetchOnePasswordNoteQuery
                 {
-                    Organization = fixture.Organization,
+                    UserId = fixture.UserId,
                     Item = fixture.Item,
                     Vault = fixture.Vault,
                     Environment = fixture.Environment,
@@ -56,16 +56,16 @@ public class OnePasswordToolValidationDecoratorTests
         }
     }
 
-    public class GetOnePasswordVaultsQueryTests
+    public class FetchOnePasswordVaultsQueryTests
     {
         public class WhenExecuteInvalidQuery
         {
             [Fact]
             public async Task ShouldValidateAndThrow()
             {
-                var fixture = new Fixture().WithInvalidValidationResult<GetOnePasswordVaultsQuery>();
+                var fixture = new Fixture().WithInvalidValidationResult<FetchOnePasswordVaultsQuery>();
 
-                var query = new GetOnePasswordVaultsQuery();
+                var query = new FetchOnePasswordVaultsQuery();
 
                 var sut = fixture.CreateSubject();
 
@@ -80,11 +80,11 @@ public class OnePasswordToolValidationDecoratorTests
             [Fact]
             public async Task ShouldValidateAndCallInnerTool()
             {
-                var fixture = new Fixture().WithValidValidationResult<GetOnePasswordVaultsQuery>();
+                var fixture = new Fixture().WithValidValidationResult<FetchOnePasswordVaultsQuery>();
 
-                var query = new GetOnePasswordVaultsQuery
+                var query = new FetchOnePasswordVaultsQuery
                 {
-                    Organization = fixture.Organization,
+                    UserId = fixture.UserId,
                     SessionToken = fixture.SessionToken
                 };
 
@@ -139,17 +139,19 @@ public class OnePasswordToolValidationDecoratorTests
 
     public class Fixture
     {
-        public string Organization { get; set; }
-        public string Environment { get; set; }
-        public string Vault { get; set; }
-        public string Item { get; set; }
-        public string SessionToken { get; set; }
+        public string Organization { get; }
+        public string UserId { get; }
+        public string Environment { get; }
+        public string Vault { get; }
+        public string Item { get; }
+        public string SessionToken { get; }
 
         public Fixture()
         {
             InnerTool = new OnePasswordToolMock();
             Validator = new ValidatorMock();
             Organization = "appy";
+            UserId = "testUserId";
             Environment = "DEV";
             Vault = "Development";
             Item = "Demo.AppSettings";
@@ -157,11 +159,11 @@ public class OnePasswordToolValidationDecoratorTests
         }
 
         public OnePasswordToolMock InnerTool { get; }
+
         public ValidatorMock Validator { get; }
-        public IOnePasswordTool CreateSubject()
-        {
-            return InnerTool.Object.WithValidation(Validator.Object);
-        }
+
+        public IOnePasswordTool CreateSubject() =>
+            InnerTool.Object.WithValidation(Validator.Object);
 
         public Fixture WithValidValidationResult<TModel>()
         {

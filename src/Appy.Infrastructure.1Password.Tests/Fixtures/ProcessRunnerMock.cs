@@ -6,7 +6,16 @@ namespace Appy.Infrastructure.OnePassword.Tests.Fixtures;
 
 public class ProcessRunnerMock: Mock<IProcessRunner>
 {
-    public ProcessRunnerMock SetupAndReturns(ProcessResult processResult)
+    public ProcessRunnerMock SetupRunOpAndReturns(ProcessSettings settings, ProcessResult processResult)
+    {
+        Setup(x => x.Run(
+                It.Is<string>(toolPath => toolPath == "op"),
+                It.Is<ProcessSettings>(ps => IsEquivalentTo(ps, settings))))
+            .ReturnsAsync(processResult);
+        return this;
+    }
+
+    public ProcessRunnerMock SetupRunAndReturns(ProcessResult processResult)
     {
         Setup(x => x.Run(
                 It.IsAny<string>(),
@@ -23,10 +32,15 @@ public class ProcessRunnerMock: Mock<IProcessRunner>
                source.CreateNoWindow == expected.CreateNoWindow;
     }
 
-    public void VerifyRunWith(string expectedTool, ProcessSettings expectedSettings)
+    public void VerifyRunCalledWith(string expectedTool, ProcessSettings expectedSettings, int times = 1)
     {
         Verify(x => x.Run(
             It.Is<string>(tool => tool == expectedTool),
-            It.Is<ProcessSettings>(ps => IsEquivalentTo(ps, expectedSettings))));
+            It.Is<ProcessSettings>(ps => IsEquivalentTo(ps, expectedSettings))), Times.Exactly(times));
+    }
+
+    public void VerifyRunNotCalledWith(string expectedTool, ProcessSettings expectedSettings)
+    {
+        VerifyRunCalledWith(expectedTool, expectedSettings, times: 0);
     }
 }

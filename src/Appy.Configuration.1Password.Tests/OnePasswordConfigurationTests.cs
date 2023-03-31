@@ -16,7 +16,7 @@ public class OnePasswordConfigurationTests
         [Theory]
         [InlineData(null, "", "", "", "")]
         [InlineData("", "", "", "", "")]
-        public void ShouldThrowArgumentExceptionWithInvalidParams(string appName, string organization, string vault,
+        public void ShouldThrowArgumentExceptionWithInvalidParams(string appName, string userId, string vault,
             string environment, string sessionToken)
         {
             var fixture = new Fixture();
@@ -24,7 +24,7 @@ public class OnePasswordConfigurationTests
             Action act = () => new OnePasswordConfigurationSource(
                 fixture.Tool.Object,
                 appName,
-                organization,
+                userId,
                 vault,
                 environment,
                 sessionToken);
@@ -40,13 +40,13 @@ public class OnePasswordConfigurationTests
             var configurationSource = new OnePasswordConfigurationSource(
                 fixture.Tool.Object,
                 fixture.AppName,
-                fixture.Organization,
+                fixture.UserId,
                 fixture.Vault,
                 fixture.Environment,
                 fixture.SessionToken);
 
             configurationSource.AppName.Should().Be(fixture.AppName);
-            configurationSource.Organization.Should().Be(fixture.Organization);
+            configurationSource.UserId.Should().Be(fixture.UserId);
             configurationSource.Vault.Should().Be(fixture.Vault);
             configurationSource.Environment.Should().Be(fixture.Environment);
             configurationSource.SessionToken.Should().Be(fixture.SessionToken);
@@ -58,7 +58,7 @@ public class OnePasswordConfigurationTests
         [Fact]
         public void ShouldCallToolAndGetValidQueryResult()
         {
-            ;               var fixture = new Fixture().WithValidNoteQueryResult();
+            var fixture = new Fixture().WithValidNoteQueryResult();
             var sut = fixture.CreateSubject();
 
             sut.Load();
@@ -69,28 +69,28 @@ public class OnePasswordConfigurationTests
 
         [Theory]
         [MemberData(nameof(InvalidNoteQueryResults))]
-        public void ShouldThrowWhenInvalidNoteQueryResult(GetOnePasswordNoteQueryResult result)
+        public void ShouldThrowWhenInvalidNoteQueryResult(FetchOnePasswordNoteQueryResult result)
         {
             var fixture = new Fixture().WithNoteQueryResult(result);
             var sut = fixture.CreateSubject();
 
-            Action act = () => sut.Load();
+            var act = () => sut.Load();
 
             act.Should().Throw<OnePasswordConfigurationException>();
         }
 
         public static IEnumerable<object[]> InvalidNoteQueryResults()
         {
-            yield return new object[] { new GetOnePasswordNoteQueryResult() };
-            yield return new object[] { new GetOnePasswordNoteQueryResult
+            yield return new object[] { new FetchOnePasswordNoteQueryResult() };
+            yield return new object[] { new FetchOnePasswordNoteQueryResult
             {
-                Fields = new List<OnePasswordField> { new OnePasswordField() }
+                Fields = new List<OnePasswordField> { new() }
             }};
-            yield return new object[] { new GetOnePasswordNoteQueryResult
+            yield return new object[] { new FetchOnePasswordNoteQueryResult
             {
                 Fields = new List<OnePasswordField>
                 {
-                    new OnePasswordField { Name = "Database" }
+                    new() { Name = "Database" }
                 }
             }};
         }
@@ -101,51 +101,56 @@ public class OnePasswordConfigurationTests
         public OnePasswordToolMock Tool { get; }
         public string AppName { get; set; }
         public string Organization { get; set; }
+        public string UserId { get; set; }
         public string Vault { get; set; }
         public string Environment { get; set; }
         public string SessionToken { get; set; }
         public string FieldName { get; set; }
         public string FieldValue { get; set; }
-        public GetOnePasswordNoteQuery ValidNoteQuery { get; }
-        public GetOnePasswordNoteQueryResult ValidNoteQueryResult { get; }
+        public FetchOnePasswordNoteQuery ValidNoteQuery { get; }
+        public FetchOnePasswordNoteQueryResult ValidNoteQueryResult { get; }
 
         public Fixture()
         {
             Tool = new OnePasswordToolMock();
             AppName = "Appy.Fake";
             Organization = "appy";
+            UserId = "testUserId";
             Vault = "Development";
             Environment = "DEV";
             SessionToken = "FakeToken";
             FieldName = "Database";
             FieldValue = "Test";
 
-            ValidNoteQuery = new GetOnePasswordNoteQuery
+            ValidNoteQuery = new FetchOnePasswordNoteQuery
             {
                 Item = $"{AppName}.AppSettings",
-                Organization = Organization,
+                UserId = UserId,
                 Vault = Vault,
                 Environment = Environment,
                 SessionToken = SessionToken
             };
 
-            ValidNoteQueryResult = new GetOnePasswordNoteQueryResult
+            ValidNoteQueryResult = new FetchOnePasswordNoteQueryResult
             {
                 Title = "DEV",
                 Fields = new List<OnePasswordField>
                 {
-                    new OnePasswordField { Name = FieldName, Value = FieldValue }
+                    new() { Name = FieldName, Value = FieldValue }
                 }
             };
         }
 
-        public OnePasswordConfigurationProvider CreateSubject()
-        {
-            return new OnePasswordConfigurationProvider(
-                new OnePasswordConfigurationSource(Tool.Object, AppName, Organization, Vault, Environment, SessionToken));
-        }
+        public OnePasswordConfigurationProvider CreateSubject() => new(
+            new OnePasswordConfigurationSource(
+                tool: Tool.Object,
+                appName: AppName,
+                userId: UserId,
+                vault: Vault,
+                environment: Environment,
+                sessionToken: SessionToken));
 
-        public Fixture WithNoteQueryResult(GetOnePasswordNoteQueryResult result)
+        public Fixture WithNoteQueryResult(FetchOnePasswordNoteQueryResult result)
         {
             Tool.SetupAndReturns(result);
             return this;

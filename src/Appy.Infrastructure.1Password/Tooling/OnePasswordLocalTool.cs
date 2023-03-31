@@ -12,6 +12,7 @@ using Appy.Configuration.Serializers;
 using Appy.Infrastructure.OnePassword.Commands;
 using Appy.Infrastructure.OnePassword.Model;
 using Appy.Infrastructure.OnePassword.Queries;
+using Appy.Infrastructure.OnePassword.Tooling.Internal;
 
 namespace Appy.Infrastructure.OnePassword.Tooling;
 
@@ -33,32 +34,34 @@ public class OnePasswordLocalTool : IOnePasswordTool
         _processRunner = processRunner ?? throw new ArgumentNullException(nameof(processRunner));
     }
 
-    static Task<ProcessResult> GetItem(IProcessRunner processRunner, string organization, string vault, string item, string sessionToken)
+    static Task<ProcessResult> GetItem(IProcessRunner processRunner, string userId, string vault, string item, string sessionToken)
     {
         var processSettings = new ProcessSettings
         {
             Arguments = new ProcessArgumentBuilder()
-                .Append("get")
                 .Append("item")
+                .Append("get")
                 .Append(item)
                 .Append("--vault")
-                .Append(vault),
+                .Append(vault)
+                .WithJsonFormat(),
             EnvironmentVariables = new Dictionary<string, string>()
-                .AddValue($"OP_SESSION_{organization}", sessionToken)
+                .AddValue($"OP_SESSION_{userId}", sessionToken)
         };
 
         return processRunner.Run(ToolPath, processSettings);
     }
 
-    static Task<ProcessResult> GetVaults(IProcessRunner processRunner, string organization, string sessionToken)
+    static Task<ProcessResult> GetVaults(IProcessRunner processRunner, string userId, string sessionToken)
     {
         var processSettings = new ProcessSettings
         {
             Arguments = new ProcessArgumentBuilder()
+                .Append("vault")
                 .Append("list")
-                .Append("vaults"),
+                .WithJsonFormat(),
             EnvironmentVariables = new Dictionary<string, string>()
-                .AddValue($"OP_SESSION_{organization}", sessionToken)
+                .AddValue($"OP_SESSION_{userId}", sessionToken)
         };
 
         return processRunner.Run(ToolPath, processSettings);
@@ -79,12 +82,7 @@ public class OnePasswordLocalTool : IOnePasswordTool
 
         var processSettings = new ProcessSettings
         {
-            Arguments = new ProcessArgumentBuilder()
-                .Append("signin")
-                .Append($"https://{command.Organization}.1password.com")
-                .AppendIf(command.IsFirstSignIn, command.Email!)
-                .AppendIf(command.IsFirstSignIn, command.SecretKey!)
-                .Append("--raw"),
+            Arguments = CreateArgumentsFrom(command),
             EnvironmentVariables = new Dictionary<string, string>(),
             RedirectStandardInput = false,
             CreateNoWindow = false,
@@ -94,46 +92,89 @@ public class OnePasswordLocalTool : IOnePasswordTool
         return processRunner.Run(ToolPath, processSettings);
     }
 
+    static ProcessArgumentBuilder CreateArgumentsFrom(SignInOnePasswordCommand command)
+    {
+        var processArgumentBuilder = new ProcessArgumentBuilder();
+
+        return command.IsFirstSignIn
+            ? processArgumentBuilder.WithAddAccountAndSigninParameters(command)
+            : processArgumentBuilder.WithSigninWithAccountParameters(command.Organization);
+    }
+
+    async Task<IReadOnlyCollection<OnePasswordAccount>> FetchAllAccounts()
+    {
+        var processSettings = new ProcessSettings
+        {
+            Arguments = new ProcessArgumentBuilder()
+                .Append("account")
+                .Append("list")
+                .WithJsonFormat()
+        };
+
+        var processResult = await _processRunner.Run(ToolPath, processSettings);
+
+        processResult.ValidateAndThrow();
+
+        return _serializer.DeserializeAndThrow<IReadOnlyCollection<OnePasswordAccount>>(processResult.StandardOutput);
+    }
+
+    async Task<string> FetchCurrentUserId(SignInOnePasswordCommand command)
+    {
+        if (!command.IsFirstSignIn)
+            return command.UserId!;
+
+        var accounts = await FetchAllAccounts();
+
+        var accountShorthand = OnePasswordAccountHelper.ShorthandForOrg(command.Organization);
+
+        var current = accounts.FirstOrDefault(x => x.Shorthand.Equals(accountShorthand, StringComparison.OrdinalIgnoreCase));
+
+        if (current == null)
+            throw new InvalidOperationException($"Could not find a 1Password account with the shorthand '{accountShorthand}'.");
+
+        return current.User_uuid;
+    }
+
     ///<inheritdoc cref="IOnePasswordTool"/>
-    public async Task<GetOnePasswordNoteQueryResult> Execute(GetOnePasswordNoteQuery query, CancellationToken cancellationToken = default)
+    public async Task<FetchOnePasswordNoteQueryResult> Execute(FetchOnePasswordNoteQuery query, CancellationToken cancellationToken = default)
     {
         var processResult = await GetItem(
             processRunner: _processRunner,
-            organization: query.Organization,
+            userId: query.UserId,
             vault: query.Vault,
             item: query.Item,
             sessionToken: query.SessionToken);
 
         processResult.ValidateAndThrow();
 
-        var note = _serializer.DeserializeAndThrow<OnePasswordNote>(processResult.StandardOutput);
+        var note = _serializer.DeserializeAndThrow<OnePasswordInternalNote>(processResult.StandardOutput);
 
-        var envSection = note?.GetSectionByEnvironment(query.Environment);
+        var envFields = note?.GetFieldsForEnvironment(query.Environment);
 
-        return new GetOnePasswordNoteQueryResult
+        return new FetchOnePasswordNoteQueryResult
         {
-            Title = envSection?.Title!,
-            Fields = envSection?.Fields?.Select(f => new OnePasswordField
+            Title = query.Environment,
+            Fields = envFields?.Select(field => new OnePasswordField
             {
-                Name = f.T,
-                Value = f.V
+                Name = field.Label,
+                Value = field.Value
             }).ToList()
         };
     }
 
     ///<inheritdoc cref="IOnePasswordTool"/>
-    public async Task<GetOnePasswordVaultsQueryResult> Execute(GetOnePasswordVaultsQuery query, CancellationToken cancellationToken = default)
+    public async Task<FetchOnePasswordVaultsQueryResult> Execute(FetchOnePasswordVaultsQuery query, CancellationToken cancellationToken = default)
     {
         var processResult = await GetVaults(
             processRunner: _processRunner,
-            organization: query.Organization,
+            userId: query.UserId,
             sessionToken: query.SessionToken);
 
         processResult.ValidateAndThrow();
 
-        var vaults = _serializer.DeserializeAndThrow<IList<OnePasswordVault>>(processResult.StandardOutput);
+        var vaults = _serializer.DeserializeAndThrow<IReadOnlyCollection<OnePasswordVault>>(processResult.StandardOutput);
 
-        return new GetOnePasswordVaultsQueryResult
+        return new FetchOnePasswordVaultsQueryResult
         {
             Vaults = vaults
         };
@@ -148,6 +189,8 @@ public class OnePasswordLocalTool : IOnePasswordTool
 
         var sessionToken = processResult.StandardOutput.TrimEnd('\n');
 
-        return SignInOnePasswordResult.Create(sessionToken);
+        var userId = await FetchCurrentUserId(command);
+
+        return SignInOnePasswordResult.Create(userId, sessionToken);
     }
 }

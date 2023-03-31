@@ -11,14 +11,19 @@ public class SignInOnePasswordCommandValidator: IValidator<SignInOnePasswordComm
         if (string.IsNullOrWhiteSpace(command.Organization))
             return result.WithError(nameof(command.Organization).ToLower(), "1Password Organization must be specified.");
 
-        if (!command.IsFirstSignIn)
+        if (command.IsFirstSignIn)
+        {
+            if (string.IsNullOrWhiteSpace(command.Email))
+                return result.WithError(nameof(command.Email).ToLower(), "1Password Email must be specified.");
+
+            if (string.IsNullOrWhiteSpace(command.SecretKey))
+                return result.WithError(nameof(command.SecretKey).ToLower(), "1Password Secret Key must be specified.");
+
             return result;
-
-        if (string.IsNullOrWhiteSpace(command.Email))
-            return result.WithError(nameof(command.Email).ToLower(), "1Password Email must be specified.");
-
-        if (string.IsNullOrWhiteSpace(command.SecretKey))
-            return result.WithError(nameof(command.Email).ToLower(), "1Password Secret Key must be specified.");
+        }
+        
+        if (string.IsNullOrWhiteSpace(command.UserId))
+            return result.WithError(nameof(command.UserId).ToLower(), "1Password User Id must be specified.");
 
         return result;
     }

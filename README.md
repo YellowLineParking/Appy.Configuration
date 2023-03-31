@@ -6,7 +6,7 @@
 
 Configuration providers for Dotnet.
 
-The latest supported version of 1Password CLI is 1.12.5.
+The latest supported version of 1Password CLI is 2.16.1.
 
 ## Configuration Providers
 
@@ -145,6 +145,7 @@ The session information is stored in the next user's environment variables:
 
 ```
 - APPY_OP_ORGANIZATION
+- APPY_OP_USERID
 - APPY_OP_VAULT
 - APPY_OP_ENVIRONMENT
 - APPY_OP_SESSION_TOKEN
@@ -159,7 +160,8 @@ Storing environment variables globally on MacOS or Linux always seems complicate
 The file will contain the following information:
 
 ```
-APPY_OP_ORGANIZATION=yourorg
+APPY_OP_ORGANIZATION=your organization
+APPY_OP_USERID=your user id
 APPY_OP_VAULT=Development
 APPY_OP_ENVIRONMENT=DEV
 APPY_OP_SESSION_TOKEN=1password session token
@@ -178,7 +180,7 @@ For an easy installation, we recommend that you first install [Chocolatey Packag
 Open a Powershell console and install 1Password CLI:
 
 ```console
-choco install op --version=1.12.5 
+choco install op --version=2.16.1
 ```
 
 #### MacOS
@@ -188,7 +190,7 @@ For an easy installation, we recommend that you first install [Brew Package Mana
 Open a console and install 1Password CLI using brew cask:
 
 ```console
-brew install 1password-cli1
+brew install --cask 1password/tap/1password-cli
 ```
 
 #### Linux
@@ -212,9 +214,10 @@ Execute the next command to signin to 1Password and set the vault and environmen
 ```console
 appy-op --signin <yourorg> <email-address> <secret_key> --vault Development -env QA
 ```
+
 *Note: make sure to use the Secret Key and not the Master Password*
 
-You can get these data from your 1Password Desktop or Mobile App account details.
+You can get these data from your profile on the 1Password website.
 
 Then, it will ask for your Master Password.
 
@@ -230,10 +233,11 @@ Updating 1Password session information.
 
 Appy 1Password session started:
 +------------------------------------------------------------+
-| Organization | youorg                                      |
+| Organisation | your org                                    |
+| UserId       | your user id                                |
 | Vault        | Development                                 |
 | Environment  | DEV                                         |
-| SessionToken | 1password session token                     |
+| SessionToken | session token                               |
 +------------------------------------------------------------+
 
 You can now go to your project and start your debug session.
@@ -269,7 +273,7 @@ appy-op -s -a
 
 ### Nano Api and Docker
 
-In search of supporting projects that want to run or debug their projects inside Docker and at the same time consume the configuration from 1Password, a simple Nano Api integrated directly in the tool was added. This eliminates the need to have any reference to the 1Password cli in your project image.
+In search of supporting projects that could be executed inside Docker and at the same time consume the configuration from 1Password, a simple Nano Api integrated directly in the tool was added. This eliminates the need to have any reference to the 1Password cli in your project image.
 
 ```console
 appy-op -s -a -api 5500

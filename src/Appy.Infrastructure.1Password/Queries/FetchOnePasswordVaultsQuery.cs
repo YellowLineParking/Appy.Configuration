@@ -1,7 +1,7 @@
 namespace Appy.Infrastructure.OnePassword.Queries;
 
-public class GetOnePasswordVaultsQuery
+public class FetchOnePasswordVaultsQuery
 {
-    public string Organization { get; set; }
+    public string UserId { get; set; }
     public string SessionToken { get; set; }
 }

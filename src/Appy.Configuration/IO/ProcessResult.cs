@@ -2,7 +2,7 @@ namespace Appy.Configuration.IO;
 
 public sealed class ProcessResult
 {
-    internal ProcessResult(string standardOutput, string standardError, int exitCode)
+    ProcessResult(string standardOutput, string standardError, int exitCode)
     {
         StandardOutput = standardOutput;
         StandardError = standardError;
@@ -10,7 +10,7 @@ public sealed class ProcessResult
     }
 
     public static ProcessResult Create(string standardOutput, string standardError, int exitCode) =>
-        new ProcessResult(standardOutput, standardError, exitCode);
+        new(standardOutput, standardError, exitCode);
 
     public int ExitCode { get; }
 

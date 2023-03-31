@@ -48,7 +48,7 @@ public class AppyOnePasswordToolCli : IAppyOnePasswordToolCli
         _onePasswordTool = onePasswordTool ?? throw new ArgumentNullException(nameof(onePasswordTool));
     }
 
-    SignInOnePasswordCommand BuildSignInCommand(CommandLineApplication app, CommandOption option, AppyOnePasswordSession currentSession)
+    static SignInOnePasswordCommand BuildSignInCommand(CommandLineApplication app, CommandOption option, AppyOnePasswordSession currentSession)
     {
         if (!option.HasValue())
         {
@@ -57,7 +57,7 @@ public class AppyOnePasswordToolCli : IAppyOnePasswordToolCli
 
         var parameters = option.Value()!.SplitBySpaceAndTrimSpaces();
 
-        var hasValidParameters = parameters.Count == 0 || parameters.Count == 3;
+        var hasValidParameters = parameters.Count is 0 or 3;
         if (!hasValidParameters)
         {
             throw new CommandParsingException(app, "Signin values must be specified: <organization> <email_address> <secret_key>.");
@@ -67,16 +67,17 @@ public class AppyOnePasswordToolCli : IAppyOnePasswordToolCli
         {
             return new SignInOnePasswordCommand
             {
-                Organization = parameters.ElementAt(0),
-                Email = parameters.ElementAt(1),
-                SecretKey = parameters.ElementAt(2),
-                IsFirstSignIn = true
+                IsFirstSignIn = true,
+                Organization = parameters[0],
+                Email = parameters[1],
+                SecretKey = parameters[2]
             };
         }
 
         return new SignInOnePasswordCommand
         {
-            Organization = currentSession.Organization
+            Organization = currentSession.Organization,
+            UserId = currentSession.UserId
         };
     }
 
@@ -84,9 +85,9 @@ public class AppyOnePasswordToolCli : IAppyOnePasswordToolCli
     {
         _logger.LogInformation($"Self-renewing the session activity after {AutoRenewDelayInMins} min.");
 
-        var query = new GetOnePasswordVaultsQuery
+        var query = new FetchOnePasswordVaultsQuery
         {
-            Organization = session.Organization!,
+            UserId = session.UserId!,
             SessionToken = session.SessionToken!
         };
 
@@ -137,6 +138,7 @@ public class AppyOnePasswordToolCli : IAppyOnePasswordToolCli
 
             var session = AppyOnePasswordSession.New(
                 organization: signInCommand.Organization,
+                userId: signInResult.UserId,
                 vault: vault,
                 environment: environment,
                 sessionToken: signInResult.SessionToken);

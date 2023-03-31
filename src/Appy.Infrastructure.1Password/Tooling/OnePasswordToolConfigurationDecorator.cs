@@ -9,8 +9,8 @@ namespace Appy.Infrastructure.OnePassword.Tooling;
 
 public class OnePasswordToolConfigurationDecorator: IOnePasswordTool
 {
-    private readonly IOnePasswordTool _innerTool;
-    private readonly IOnePasswordSessionStorage _sessionStorage;
+    readonly IOnePasswordTool _innerTool;
+    readonly IOnePasswordSessionStorage _sessionStorage;
 
     public OnePasswordToolConfigurationDecorator(
         IOnePasswordTool innerTool,
@@ -20,11 +20,11 @@ public class OnePasswordToolConfigurationDecorator: IOnePasswordTool
         _sessionStorage = sessionStorage ?? throw new ArgumentNullException(nameof(sessionStorage));
     }
 
-    public async Task<GetOnePasswordNoteQueryResult> Execute(GetOnePasswordNoteQuery query, CancellationToken cancellationToken = default)
+    public async Task<FetchOnePasswordNoteQueryResult> Execute(FetchOnePasswordNoteQuery query, CancellationToken cancellationToken = default)
     {
         var session = await _sessionStorage.GetCurrent();
 
-        query.Organization = (query.Organization ?? session.Organization)!;
+        query.UserId = (query.UserId ?? session.UserId)!;
         query.Environment = (query.Environment ?? session.Environment)!;
         query.Vault = (query.Vault ?? session.Vault)!;
         query.SessionToken = (query.SessionToken ?? session.SessionToken)!;
@@ -32,7 +32,7 @@ public class OnePasswordToolConfigurationDecorator: IOnePasswordTool
         return await _innerTool.Execute(query, cancellationToken);
     }
 
-    public Task<GetOnePasswordVaultsQueryResult> Execute(GetOnePasswordVaultsQuery query, CancellationToken cancellationToken = default)
+    public Task<FetchOnePasswordVaultsQueryResult> Execute(FetchOnePasswordVaultsQuery query, CancellationToken cancellationToken = default)
     {
         return _innerTool.Execute(query, cancellationToken);
     }

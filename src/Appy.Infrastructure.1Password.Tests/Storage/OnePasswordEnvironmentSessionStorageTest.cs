@@ -25,6 +25,7 @@ public class OnePasswordEnvironmentSessionStorageTest
                 var result = await sut.GetCurrent();
 
                 fixture.EnvAccessor.VerifyGetUserEnvCalledWith("APPY_OP_ORGANIZATION");
+                fixture.EnvAccessor.VerifyGetUserEnvCalledWith("APPY_OP_USERID");
                 fixture.EnvAccessor.VerifyGetUserEnvCalledWith("APPY_OP_ENVIRONMENT");
                 fixture.EnvAccessor.VerifyGetUserEnvCalledWith("APPY_OP_SESSION_TOKEN");
                 fixture.EnvAccessor.VerifyGetUserEnvCalledWith("APPY_OP_VAULT");
@@ -44,6 +45,7 @@ public class OnePasswordEnvironmentSessionStorageTest
                 var result = await sut.GetCurrent();
 
                 fixture.EnvAccessor.VerifyGetProcessEnvCalledWith("APPY_OP_ORGANIZATION");
+                fixture.EnvAccessor.VerifyGetProcessEnvCalledWith("APPY_OP_USERID");
                 fixture.EnvAccessor.VerifyGetProcessEnvCalledWith("APPY_OP_ENVIRONMENT");
                 fixture.EnvAccessor.VerifyGetProcessEnvCalledWith("APPY_OP_VAULT");
                 fixture.EnvAccessor.VerifyGetProcessEnvCalledWith("APPY_OP_SESSION_TOKEN");
@@ -64,7 +66,8 @@ public class OnePasswordEnvironmentSessionStorageTest
                 var sut = fixture.CreateSubject();
 
                 var session = AppyOnePasswordSession.Empty();
-                Func<Task> act = () => sut.Update(session);
+
+                var act = () => sut.Update(session);
 
                 await act.Should().ThrowAsync<PlatformNotSupportedException>();
             }
@@ -73,11 +76,12 @@ public class OnePasswordEnvironmentSessionStorageTest
         public class WhenRunningOnWindowsAndInvalidSession
         {
             [Theory]
-            [InlineData(null, null, null, null)]
-            [InlineData("appy", null, null, null)]
-            [InlineData("appy", "DEV", null, null)]
-            [InlineData("appy", "DEV", "Development", null)]
-            public async Task ShouldThrowArgumentException(string organization, string environment, string vault, string sessionToken)
+            [InlineData(null, null, null, null, null)]
+            [InlineData("appy", null, null, null, null)]
+            [InlineData("appy", "testUserId", null, null, null)]
+            [InlineData("appy", "testUserId", "DEV", null, null)]
+            [InlineData("appy", "testUserId", "DEV", "Development", null)]
+            public async Task ShouldThrowArgumentException(string organization, string userId, string environment, string vault, string sessionToken)
             {
                 var fixture = new Fixture()
                     .WithWindowsPlatform();
@@ -86,11 +90,12 @@ public class OnePasswordEnvironmentSessionStorageTest
 
                 var session = AppyOnePasswordSession.New(
                     organization: organization,
+                    userId: userId,
                     environment: environment,
                     vault: vault,
                     sessionToken: sessionToken);
 
-                Func<Task> act = () => sut.Update(session);
+                var act = () => sut.Update(session);
 
                 await act.Should().ThrowAsync<ArgumentException>();
             }
@@ -108,6 +113,7 @@ public class OnePasswordEnvironmentSessionStorageTest
 
                 var session = AppyOnePasswordSession.New(
                     organization: fixture.Organization,
+                    userId: fixture.UserId,
                     environment: fixture.Environment,
                     vault: fixture.Vault,
                     sessionToken: fixture.SessionToken);
@@ -115,6 +121,7 @@ public class OnePasswordEnvironmentSessionStorageTest
                 await sut.Update(session);
 
                 fixture.EnvAccessor.VerifySetUserEnvCalledWith("APPY_OP_ORGANIZATION", session.Organization);
+                fixture.EnvAccessor.VerifySetUserEnvCalledWith("APPY_OP_USERID", session.UserId);
                 fixture.EnvAccessor.VerifySetUserEnvCalledWith("APPY_OP_ENVIRONMENT", session.Environment);
                 fixture.EnvAccessor.VerifySetUserEnvCalledWith("APPY_OP_VAULT", session.Vault);
                 fixture.EnvAccessor.VerifySetUserEnvCalledWith("APPY_OP_SESSION_TOKEN", session.SessionToken);
@@ -125,6 +132,7 @@ public class OnePasswordEnvironmentSessionStorageTest
     public class Fixture
     {
         public string Organization { get; }
+        public string UserId { get; }
         public string Environment { get; }
         public string Vault { get; }
         public string SessionToken { get; }
@@ -134,6 +142,7 @@ public class OnePasswordEnvironmentSessionStorageTest
             PlatformInfo = new PlatformInformationMock();
             EnvAccessor = new EnvironmentAccessorMock();
             Organization = "appy";
+            UserId = "testUserId";
             Environment = "DEV";
             Vault = "Development";
             SessionToken = "FakeToken";
@@ -142,10 +151,8 @@ public class OnePasswordEnvironmentSessionStorageTest
         public PlatformInformationMock PlatformInfo { get; }
         public EnvironmentAccessorMock EnvAccessor { get; }
 
-        public IOnePasswordSessionStorage CreateSubject()
-        {
-            return new OnePasswordEnvironmentSessionStorage(PlatformInfo.Object, EnvAccessor.Object);
-        }
+        public IOnePasswordSessionStorage CreateSubject() =>
+            new OnePasswordEnvironmentSessionStorage(PlatformInfo.Object, EnvAccessor.Object);
 
         public Fixture WithWindowsPlatform()
         {

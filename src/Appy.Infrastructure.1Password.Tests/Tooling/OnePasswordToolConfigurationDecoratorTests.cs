@@ -9,7 +9,7 @@ namespace Appy.Infrastructure.OnePassword.Tests.Tooling;
 
 public class OnePasswordToolConfigurationDecoratorTests
 {
-    public class GetOnePasswordNoteQueryTests
+    public class FetchOnePasswordNoteQueryTests
     {
         public class WhenExecuteQueryWithOnlyRequiredProperties
         {
@@ -19,16 +19,16 @@ public class OnePasswordToolConfigurationDecoratorTests
                 var fixture = new Fixture()
                     .WithCurrentSession();
 
-                var query = new GetOnePasswordNoteQuery
+                var query = new FetchOnePasswordNoteQuery
                 {
                     Item = "Demo.AppSettings",
                 };
 
                 var sut = fixture.CreateSubject();
 
-                var expectedInnerQuery = new GetOnePasswordNoteQuery
+                var expectedInnerQuery = new FetchOnePasswordNoteQuery
                 {
-                    Organization = fixture.Organization,
+                    UserId = fixture.UserId,
                     Item = query.Item,
                     Vault = fixture.Vault,
                     Environment = fixture.Environment,
@@ -44,17 +44,19 @@ public class OnePasswordToolConfigurationDecoratorTests
 
     public class Fixture
     {
-        public string Organization { get; set; }
-        public string Environment { get; set; }
-        public string Vault { get; set; }
-        public string Item { get; set; }
-        public string SessionToken { get; set; }
+        public string Organization { get; }
+        public string UserId { get; }
+        public string Environment { get; }
+        public string Vault { get; }
+        public string Item { get; }
+        public string SessionToken { get; }
 
         public Fixture()
         {
             InnerTool = new OnePasswordToolMock();
             SessionStorage = new OnePasswordSessionStorageMock();
             Organization = "appy";
+            UserId = "testUserId";
             Environment = "DEV";
             Vault = "Development";
             Item = "Demo.AppSettings";
@@ -64,14 +66,14 @@ public class OnePasswordToolConfigurationDecoratorTests
         public OnePasswordToolMock InnerTool { get; }
         public OnePasswordSessionStorageMock SessionStorage { get; }
 
-        public IOnePasswordTool CreateSubject()
-        {
-            return InnerTool.Object.WithConfiguration(SessionStorage.Object);
-        }
+        public IOnePasswordTool CreateSubject() =>
+            InnerTool.Object.WithConfiguration(SessionStorage.Object);
+
         public Fixture WithCurrentSession()
         {
             SessionStorage.SetupGetAndReturns(AppyOnePasswordSession.New(
                 organization: Organization,
+                userId: UserId,
                 vault: Vault,
                 environment: Environment,
                 sessionToken: SessionToken));

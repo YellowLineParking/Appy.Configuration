@@ -60,7 +60,11 @@ public static class OnePasswordToolCliTests
         public async Task ShouldSigninWithCurrentSessionOrganization()
         {
             var fixture = new Fixture().WithValidCurrentSession();
-            var expectedCmd = new SignInOnePasswordCommand {Organization = fixture.Organization};
+            var expectedCmd = new SignInOnePasswordCommand
+            {
+                Organization = fixture.Organization,
+                UserId = fixture.UserId
+            };
 
             var sut = fixture.CreateSubject();
             var args = new[] { "-s" };
@@ -79,10 +83,10 @@ public static class OnePasswordToolCliTests
             var fixture = new Fixture().WithValidCurrentSession();
             var expectedCmd = new SignInOnePasswordCommand
             {
+                IsFirstSignIn = true,
                 Organization = fixture.Organization,
                 Email = fixture.Email,
-                SecretKey = fixture.Secretkey,
-                IsFirstSignIn = true
+                SecretKey = fixture.Secretkey
             };
 
             var sut = fixture.CreateSubject();
@@ -105,6 +109,7 @@ public static class OnePasswordToolCliTests
 
             var expected = AppyOnePasswordSession.New(
                 organization: fixture.Organization,
+                userId: fixture.UserId,
                 vault: fixture.Vault,
                 environment: fixture.Environment,
                 sessionToken: fixture.SessionToken);
@@ -129,6 +134,7 @@ public static class OnePasswordToolCliTests
             var environment = "LIVE";
             var expected = AppyOnePasswordSession.New(
                 organization: fixture.Organization,
+                userId: fixture.UserId,
                 vault: fixture.Vault,
                 environment: environment,
                 sessionToken: fixture.SessionToken);
@@ -154,6 +160,7 @@ public static class OnePasswordToolCliTests
             var vault = "Private";
             var expected = AppyOnePasswordSession.New(
                 organization: fixture.Organization,
+                userId: fixture.UserId,
                 vault: vault,
                 environment: fixture.Environment,
                 sessionToken: fixture.SessionToken);
@@ -191,6 +198,7 @@ public static class OnePasswordToolCliTests
         {
             var expected = AppyOnePasswordSession.New(
                 organization: _fixture.Organization,
+                userId: _fixture.UserId,
                 vault: _fixture.Vault,
                 environment: _fixture.Environment,
                 sessionToken: _fixture.SessionToken);
@@ -331,7 +339,7 @@ public static class OnePasswordToolCliTests
         [Fact]
         public void ShouldLogInfoAboutRenewSessionActivity()
         {
-            var autoRenewDelayInMins = 29;
+            const int autoRenewDelayInMins = 29;
 
             _fixture.Logger.VerifyLogInformation($"Self-renewing the session activity after {autoRenewDelayInMins} min.");
 
@@ -343,9 +351,9 @@ public static class OnePasswordToolCliTests
         [Fact]
         public void ShouldAutoRenewSessionActivityWithVaultsQuery()
         {
-            var expected = new GetOnePasswordVaultsQuery
+            var expected = new FetchOnePasswordVaultsQuery
             {
-                Organization = _fixture.Organization,
+                UserId = _fixture.UserId,
                 SessionToken = _fixture.SessionToken
             };
 
@@ -358,6 +366,7 @@ public static class OnePasswordToolCliTests
     class Fixture
     {
         public string Organization { get; }
+        public string UserId { get; }
         public string Email { get; }
         public string Secretkey { get; }
         public string Environment { get; }
@@ -377,6 +386,7 @@ public static class OnePasswordToolCliTests
             CommandLineApplicationFactory.SetupAndReturns(commandLineApp);
 
             Organization = "appy";
+            UserId = "testUserId";
             Email = "test@appy.com";
             Secretkey = "FakeSecretKey";
             Environment = "DEV";
@@ -407,6 +417,7 @@ public static class OnePasswordToolCliTests
         {
             SessionStorage.SetupGetAndReturns(AppyOnePasswordSession.New(
                 organization: Organization,
+                userId: UserId,
                 vault: Vault,
                 environment: Environment,
                 sessionToken: SessionToken));
@@ -415,7 +426,7 @@ public static class OnePasswordToolCliTests
 
         public Fixture WithSuccessfulSignInResult()
         {
-            Tool.SetupAndReturns(SignInOnePasswordResult.Create(SessionToken));
+            Tool.SetupAndReturns(SignInOnePasswordResult.Create(UserId, SessionToken));
             return this;
         }
 

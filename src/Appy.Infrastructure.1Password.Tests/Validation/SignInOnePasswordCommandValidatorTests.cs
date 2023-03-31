@@ -23,7 +23,11 @@ public class SignInOnePasswordCommandValidatorTests
     {
         var sut = new SignInOnePasswordCommandValidator();
 
-        var command = new SignInOnePasswordCommand {Organization = "appy"};
+        var command = new SignInOnePasswordCommand
+        {
+            Organization = "appy",
+            UserId = "testUserId"
+        };
         var result = sut.Validate(command);
 
         result.IsValid.Should().BeTrue();

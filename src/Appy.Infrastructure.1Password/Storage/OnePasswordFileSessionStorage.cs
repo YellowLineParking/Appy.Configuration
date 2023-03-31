@@ -16,7 +16,7 @@ public class OnePasswordFileSessionStorage : IOnePasswordSessionStorage
     static async Task<IEnumerable<string>> GetFileLines(string filePath)
     {
         var lines = new List<string>();
-        using var sr = new StreamReader(EnvFilePath);
+        using var sr = new StreamReader(filePath);
         var line = await sr.ReadLineAsync();
         while (!string.IsNullOrWhiteSpace(line))
         {
@@ -42,6 +42,7 @@ public class OnePasswordFileSessionStorage : IOnePasswordSessionStorage
 
         var session = AppyOnePasswordSession.New(
             organization: sessionLookup.TryGetValue(OnePasswordOrganization, out var organization) ? organization : null,
+            userId: sessionLookup.TryGetValue(OnePasswordUserId, out var userId) ? userId : null,
             environment: sessionLookup.TryGetValue(OnePasswordEnvironment, out var environment) ? environment : null,
             vault: sessionLookup.TryGetValue(KnownSessionVars.OnePasswordVault, out var vault) ? vault : null,
             sessionToken: sessionLookup.TryGetValue(OnePasswordSessionToken, out var sessionToken) ? sessionToken : null);
@@ -53,6 +54,7 @@ public class OnePasswordFileSessionStorage : IOnePasswordSessionStorage
     {
         using var sw = new StreamWriter(EnvFilePath, false);
         await sw.WriteLineAsync($"{OnePasswordOrganization}{EnvValueSeparator}{session.Organization}");
+        await sw.WriteLineAsync($"{OnePasswordUserId}{EnvValueSeparator}{session.UserId}");
         await sw.WriteLineAsync($"{OnePasswordEnvironment}{EnvValueSeparator}{session.Environment}");
         await sw.WriteLineAsync($"{KnownSessionVars.OnePasswordVault}{EnvValueSeparator}{session.Vault}");
         await sw.WriteLineAsync($"{KnownSessionVars.OnePasswordSessionToken}{EnvValueSeparator}{session.SessionToken}");

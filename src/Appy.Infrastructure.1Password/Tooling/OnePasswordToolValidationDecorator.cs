@@ -20,13 +20,13 @@ public class OnePasswordToolValidationDecorator: IOnePasswordTool
         _validator = validator ?? throw new ArgumentNullException(nameof(validator));
     }
 
-    public async Task<GetOnePasswordNoteQueryResult> Execute(GetOnePasswordNoteQuery query, CancellationToken cancellationToken = default)
+    public async Task<FetchOnePasswordNoteQueryResult> Execute(FetchOnePasswordNoteQuery query, CancellationToken cancellationToken = default)
     {
         _validator.ValidateAndThrow(query);
         return await _innerTool.Execute(query, cancellationToken);
     }
 
-    public Task<GetOnePasswordVaultsQueryResult> Execute(GetOnePasswordVaultsQuery query, CancellationToken cancellationToken = default)
+    public Task<FetchOnePasswordVaultsQueryResult> Execute(FetchOnePasswordVaultsQuery query, CancellationToken cancellationToken = default)
     {
         _validator.ValidateAndThrow(query);
         return _innerTool.Execute(query, cancellationToken);

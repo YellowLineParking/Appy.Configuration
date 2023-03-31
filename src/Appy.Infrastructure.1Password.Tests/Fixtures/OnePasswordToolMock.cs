@@ -19,10 +19,10 @@ public class OnePasswordToolMock : Mock<IOnePasswordTool>
         return this;
     }
 
-    public OnePasswordToolMock SetupAndReturns(GetOnePasswordNoteQueryResult result)
+    public OnePasswordToolMock SetupAndReturns(FetchOnePasswordNoteQueryResult result)
     {
         Setup(x => x.Execute(
-                It.IsAny<GetOnePasswordNoteQuery>(),
+                It.IsAny<FetchOnePasswordNoteQuery>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(result);
         return this;
@@ -31,24 +31,24 @@ public class OnePasswordToolMock : Mock<IOnePasswordTool>
     public OnePasswordToolMock SetupAndThrows(Exception exception)
     {
         Setup(x => x.Execute(
-                It.IsAny<GetOnePasswordNoteQuery>(),
+                It.IsAny<FetchOnePasswordNoteQuery>(),
                 It.IsAny<CancellationToken>()))
             .ThrowsAsync(exception);
         return this;
     }
 
-    public OnePasswordToolMock VerifyCalledWith(GetOnePasswordNoteQuery expected)
+    public OnePasswordToolMock VerifyCalledWith(FetchOnePasswordNoteQuery expected)
     {
         Verify(x => x.Execute(
-            It.Is<GetOnePasswordNoteQuery>(q => q.IsEquivalentTo(expected)),
+            It.Is<FetchOnePasswordNoteQuery>(q => q.IsEquivalentTo(expected)),
             It.IsAny<CancellationToken>()), Times.Once);
         return this;
     }
 
-    public OnePasswordToolMock VerifyCalledWith(GetOnePasswordVaultsQuery expected)
+    public OnePasswordToolMock VerifyCalledWith(FetchOnePasswordVaultsQuery expected)
     {
         Verify(x => x.Execute(
-            It.Is<GetOnePasswordVaultsQuery>(q => q.IsEquivalentTo(expected)),
+            It.Is<FetchOnePasswordVaultsQuery>(q => q.IsEquivalentTo(expected)),
             It.IsAny<CancellationToken>()), Times.Once);
         return this;
     }

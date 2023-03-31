@@ -8,19 +8,19 @@ namespace Appy.Configuration.OnePassword.Tests.Fixtures;
 
 public class OnePasswordToolMock : Mock<IOnePasswordTool>
 {
-    public OnePasswordToolMock SetupAndReturns(GetOnePasswordNoteQueryResult result)
+    public OnePasswordToolMock SetupAndReturns(FetchOnePasswordNoteQueryResult result)
     {
         Setup(x => x.Execute(
-            It.IsAny<GetOnePasswordNoteQuery>(),
+            It.IsAny<FetchOnePasswordNoteQuery>(),
             It.IsAny<CancellationToken>()
         )).ReturnsAsync(result);
         return this;
     }
 
-    public void VerifyCalledWith(GetOnePasswordNoteQuery expectedQuery)
+    public void VerifyCalledWith(FetchOnePasswordNoteQuery expectedQuery)
     {
         Verify(x => x.Execute(
-            It.Is<GetOnePasswordNoteQuery>(q => q.IsEquivalentTo(expectedQuery)),
+            It.Is<FetchOnePasswordNoteQuery>(q => q.IsEquivalentTo(expectedQuery)),
             It.IsAny<CancellationToken>()), Times.Once);
     }
 }

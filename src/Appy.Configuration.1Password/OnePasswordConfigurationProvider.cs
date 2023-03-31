@@ -28,9 +28,9 @@ public class OnePasswordConfigurationProvider : ConfigurationProvider
     {
         var appSettingsName = $"{_source.AppName}.AppSettings";
 
-        var query = new GetOnePasswordNoteQuery
+        var query = new FetchOnePasswordNoteQuery
         {
-            Organization = _source.Organization,
+            UserId = _source.UserId,
             Item = appSettingsName,
             Vault = _source.Vault,
             Environment = _source.Environment,

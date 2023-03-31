@@ -35,8 +35,8 @@ public static class DependencyRegistration
             .AddSingleton<IValidator, DefaultValidator>();
 
         services
-            .AddSingleton<IValidator<GetOnePasswordNoteQuery>, GetOnePasswordNoteQueryValidator>()
-            .AddSingleton<IValidator<GetOnePasswordVaultsQuery>, GetOnePasswordVaultsQueryValidator>()
+            .AddSingleton<IValidator<FetchOnePasswordNoteQuery>, FetchOnePasswordNoteQueryValidator>()
+            .AddSingleton<IValidator<FetchOnePasswordVaultsQuery>, FetchOnePasswordVaultsQueryValidator>()
             .AddSingleton<IValidator<SignInOnePasswordCommand>, SignInOnePasswordCommandValidator>();
 
         return services;
