@@ -6,7 +6,7 @@
 
 Configuration providers for Dotnet.
 
-The latest supported version of 1Password CLI is 2.16.1. In case you want to use 1Password CLI 1, install version 0.11.0 for any of the Appy packages.
+The latest supported version of 1Password CLI is 2.23.0. In case you want to use 1Password CLI 1, install version 0.11.0 for any of the Appy packages.
 
 ## Configuration Providers
 
@@ -170,20 +170,20 @@ APPY_OP_SESSION_TOKEN=1password session token
 * No password is stored on your machine, only the data of your session.
 
 ### Prerequisites
+#### Install 1Password CLI
 
 First, we should install the official [1Password CLI](https://support.1password.com/command-line/).
-
-#### Windows
+##### Windows
 
 For an easy installation, we recommend that you first install [Chocolatey Package Manager](https://chocolatey.org/install).
 
 Open a Powershell console and install 1Password CLI:
 
 ```console
-choco install op --version=2.16.1
+choco install op --version=2.23.0
 ```
 
-#### MacOS
+##### MacOS
 
 For an easy installation, we recommend that you first install [Brew Package Manager](https://brew.sh/).
 
@@ -193,9 +193,20 @@ Open a console and install 1Password CLI using brew cask:
 brew install --cask 1password/tap/1password-cli
 ```
 
-#### Linux
+##### Linux
 
 Please, follow the official ['Getting started docs from 1Password'](https://support.1password.com/command-line-getting-started/)
+
+#### Disable Integration with Desktop App
+
+For the AppyWay tool to work correctly when integrated with the 1Password CLI, the CLI integration with the desktop application must be disabled like in the next image.
+
+![Disable 1Password Desktop App CLI Integration](resources/screenshots/op-desktop-cli-integration-off.png)
+
+Steps:
+- Go to Settings
+- Click Developer
+- Unselect 'Integrate with 1Password CLI'
 
 ### Installing
 
