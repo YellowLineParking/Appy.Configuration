@@ -28,7 +28,7 @@ RUN dotnet publish "Appy.Tool.1Password.csproj" -c $configuration -o /app/publis
 
 FROM base AS final
 # Install 1Password CLI (op)
-ENV OP_VERSION 2.16.1
+ENV OP_VERSION 2.23.0
 RUN buildDeps="curl gnupg dirmngr unzip" \
     && runDeps="ca-certificates" \
     && apt-get update \
