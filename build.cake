@@ -12,6 +12,7 @@ var artifactsPath = Context.Directory("./.artifacts");
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 var configFilePath = "config.yml";
+var transversalBuildFilePath = $"{basePath}/build.csproj";
 var taskConfigManager = new ProjectTaskConfigurationManager();
 var projectDescriptors = ProjectLoader.Load(Context, configFilePath, basePath, configuration).Projects;
 var version = MinVer(settings => settings
@@ -39,6 +40,11 @@ Task("Clean")
 Task("Restore")
     .Does(() =>
 {
+    if (FileExists(transversalBuildFilePath))
+    {
+        return;
+    }
+
     DotNetRestore(basePath,
         new DotNetRestoreSettings
         {
@@ -50,6 +56,22 @@ Task("Build-Project")
     .IsDependentOn("Restore")
     .Does(context =>
 {
+    if (FileExists(transversalBuildFilePath))
+    {
+        context.Information("Building projects using Transversal Build");
+
+        DotNetBuild(transversalBuildFilePath, new DotNetBuildSettings {
+            Configuration = configuration,
+            // NoRestore = true,
+            // NoIncremental = context.HasArgument("rebuild"),
+            Verbosity = DotNetVerbosity.Minimal,
+            MSBuildSettings = new DotNetMSBuildSettings()
+                .TreatAllWarningsAs(MSBuildTreatAllWarningsAs.Error)
+        });
+
+        return;
+    }
+
     foreach(var projectDescriptor in projectDescriptors)
     {
         if (!taskConfigManager.CanBuild(projectDescriptor.Config)) continue;
@@ -97,6 +119,24 @@ Task("Test")
     .IsDependentOn("Build-Project")
     .Does(context =>
 {
+    if (FileExists(transversalBuildFilePath))
+    {
+        context.Information("Testing projects using Transversal Build");
+
+       DotNetTest(transversalBuildFilePath, new DotNetTestSettings {
+           Configuration = configuration,
+           NoRestore = true,
+           NoBuild = true,
+           TestAdapterPath = ".",
+           Loggers = new string[] {
+             "GitHubActions;report-warnings=false"
+           },
+           Verbosity = DotNetVerbosity.Quiet
+        });
+
+       return;
+    }
+
     foreach(var projectDescriptor in projectDescriptors)
     {
         if (!taskConfigManager.CanTest(projectDescriptor.Config)) continue;
@@ -121,6 +161,23 @@ Task("Package")
     .IsDependentOn("Test")
     .Does(context =>
 {
+
+    if (FileExists(transversalBuildFilePath))
+    {
+        context.Information("Packing projects using Transversal Build");
+
+        context.DotNetPack(transversalBuildFilePath, new DotNetPackSettings {
+            Configuration = configuration,
+            NoRestore = true,
+            NoBuild = true,
+            OutputDirectory = artifactsPath,
+            MSBuildSettings = new DotNetMSBuildSettings()
+              .TreatAllWarningsAs(MSBuildTreatAllWarningsAs.Error)
+        });
+
+       return;
+    }
+
     foreach(var projectDescriptor in projectDescriptors)
     {
         if (!taskConfigManager.CanPack(projectDescriptor.Config)) continue;
