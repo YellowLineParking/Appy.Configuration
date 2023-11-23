@@ -1,7 +1,9 @@
 {
-  "$schema": "http://json.schemastore.org/global",
   "sdk": {
     "version": "8.0.100",
-    "rollForward": "latestFeature"
+    "rollForward": "latestMinor"
+  },
+  "msbuild-sdks": {
+    "Microsoft.Build.Traversal": "4.1.0"
   }
 }
