@@ -6,6 +6,7 @@
     <DebugType>embedded</DebugType>
     <MinVerSkip Condition="'$(Configuration)' == 'Debug'">true</MinVerSkip>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>
   </PropertyGroup>
 
   <PropertyGroup Label="Deterministic Build" Condition="'$(GITHUB_ACTIONS)' == 'true'">
@@ -28,7 +29,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <NoWarn>1591</NoWarn>
+    <NoWarn>ASP0000;1701;1702;1591;CS1591;NU1507</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Label="Source Link">
@@ -38,30 +39,8 @@
   </PropertyGroup>
 
   <ItemGroup Label="Package References">
-    <PackageReference Include="MinVer" PrivateAssets="All" Version="2.3.0" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" Version="1.1.1" />
+    <PackageReference Include="MinVer" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
   </ItemGroup>
-
-  <PropertyGroup Label="Package Versions">
-    <MicrosoftWin32RegistryPackageVersion>5.0.0</MicrosoftWin32RegistryPackageVersion>
-    <NewtonsoftJsonPackageVersion>13.0.3</NewtonsoftJsonPackageVersion>
-    <MedallionShellPackageVersion>1.6.2</MedallionShellPackageVersion>
-    <McMasterExtensionsCommandLineUtilsPackageVersion>4.1.0</McMasterExtensionsCommandLineUtilsPackageVersion>
-    <SpectreConsolePackageVersion>0.48.0</SpectreConsolePackageVersion>
-    <TunnelVisionLabsRefAssemblyAnnotatorPackageVersion>1.0.0-alpha.160</TunnelVisionLabsRefAssemblyAnnotatorPackageVersion>
-    <NullablePackageVersion>1.3.1</NullablePackageVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Label="Test Package Versions">
-    <MartinCostelloLoggingXUnitPackageVersion>0.3.0</MartinCostelloLoggingXUnitPackageVersion>
-    <MicrosoftNETTestSdkPackageVersion>17.5.0</MicrosoftNETTestSdkPackageVersion>
-    <FluentAssertionsPackageVersion>6.10.0</FluentAssertionsPackageVersion>
-    <MoqPackageVersion>4.20.69</MoqPackageVersion>
-    <XunitPackageVersion>2.6.2</XunitPackageVersion>
-    <XunitRunnerVisualStudioPackageVersion>2.5.4</XunitRunnerVisualStudioPackageVersion>
-    <CoverletCollectorPackageVersion>6.0.0</CoverletCollectorPackageVersion>
-    <XunitXmlTestLoggerPackageVersion>3.1.17</XunitXmlTestLoggerPackageVersion>
-    <GitHubActionsTestLoggerPackageVersion>2.3.3</GitHubActionsTestLoggerPackageVersion>
-  </PropertyGroup>
 
 </Project>
