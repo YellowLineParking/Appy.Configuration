@@ -1,9 +1,9 @@
-FROM mcr.microsoft.com/dotnet/aspnet:7.0-bullseye-slim AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0.0-bookworm-slim AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0-bullseye-slim AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0.100-1-bookworm-slim AS build
 
 ARG configuration=Release
 
@@ -14,6 +14,7 @@ COPY ["src/Appy.Configuration.1Password/Appy.Configuration.1Password.csproj", "s
 COPY ["src/Appy.Infrastructure.1Password/Appy.Infrastructure.1Password.csproj", "src/Appy.Infrastructure.1Password/"]
 COPY ["src/Directory.Build.props", "src/"]
 COPY ["src/Directory.Build.targets", "src/"]
+COPY ["src/Directory.Packages.props", "src/"]
 RUN dotnet restore "src/Appy.Tool.1Password/Appy.Tool.1Password.csproj"
 COPY . .
 WORKDIR "/src/Appy.Tool.1Password"

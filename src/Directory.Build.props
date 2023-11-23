@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup Label="Settings">
     <Deterministic>true</Deterministic>
-    <LangVersion>10</LangVersion>
+    <LangVersion>12</LangVersion>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>embedded</DebugType>
     <MinVerSkip Condition="'$(Configuration)' == 'Debug'">true</MinVerSkip>
@@ -24,7 +24,7 @@
     <PackageProjectUrl>https://github.com/YellowLineParking/Appy.Configuration</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReleaseNotes>https://github.com/YellowLineParking/Appy.Configuration/releases</PackageReleaseNotes>
-    <PackageTags>NET7;NET6;NetStandard;configuration;providers;cli;tools</PackageTags>
+    <PackageTags>NET8;NET6;NetStandard;configuration;providers;cli;tools</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -44,10 +44,10 @@
 
   <PropertyGroup Label="Package Versions">
     <MicrosoftWin32RegistryPackageVersion>5.0.0</MicrosoftWin32RegistryPackageVersion>
-    <NewtonsoftJsonPackageVersion>13.0.1</NewtonsoftJsonPackageVersion>
+    <NewtonsoftJsonPackageVersion>13.0.3</NewtonsoftJsonPackageVersion>
     <MedallionShellPackageVersion>1.6.2</MedallionShellPackageVersion>
-    <McMasterExtensionsCommandLineUtilsPackageVersion>4.0.2</McMasterExtensionsCommandLineUtilsPackageVersion>
-    <SpectreConsolePackageVersion>0.46.0</SpectreConsolePackageVersion>
+    <McMasterExtensionsCommandLineUtilsPackageVersion>4.1.0</McMasterExtensionsCommandLineUtilsPackageVersion>
+    <SpectreConsolePackageVersion>0.48.0</SpectreConsolePackageVersion>
     <TunnelVisionLabsRefAssemblyAnnotatorPackageVersion>1.0.0-alpha.160</TunnelVisionLabsRefAssemblyAnnotatorPackageVersion>
     <NullablePackageVersion>1.3.1</NullablePackageVersion>
   </PropertyGroup>
@@ -56,12 +56,12 @@
     <MartinCostelloLoggingXUnitPackageVersion>0.3.0</MartinCostelloLoggingXUnitPackageVersion>
     <MicrosoftNETTestSdkPackageVersion>17.5.0</MicrosoftNETTestSdkPackageVersion>
     <FluentAssertionsPackageVersion>6.10.0</FluentAssertionsPackageVersion>
-    <MoqPackageVersion>4.18.4</MoqPackageVersion>
-    <XunitPackageVersion>2.4.2</XunitPackageVersion>
-    <XunitRunnerVisualStudioPackageVersion>2.4.5</XunitRunnerVisualStudioPackageVersion>
-    <CoverletCollectorPackageVersion>3.2.0</CoverletCollectorPackageVersion>
-    <XunitXmlTestLoggerPackageVersion>3.0.78</XunitXmlTestLoggerPackageVersion>
-    <GitHubActionsTestLoggerPackageVersion>2.0.1</GitHubActionsTestLoggerPackageVersion>
+    <MoqPackageVersion>4.20.69</MoqPackageVersion>
+    <XunitPackageVersion>2.6.2</XunitPackageVersion>
+    <XunitRunnerVisualStudioPackageVersion>2.5.4</XunitRunnerVisualStudioPackageVersion>
+    <CoverletCollectorPackageVersion>6.0.0</CoverletCollectorPackageVersion>
+    <XunitXmlTestLoggerPackageVersion>3.1.17</XunitXmlTestLoggerPackageVersion>
+    <GitHubActionsTestLoggerPackageVersion>2.3.3</GitHubActionsTestLoggerPackageVersion>
   </PropertyGroup>
 
 </Project>

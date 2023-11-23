@@ -37,11 +37,11 @@ public class WinRegistryConfigurationProvider : ConfigurationProvider
 
         if (section == null)
         {
-            Data = new Dictionary<string, string>();
+            Data = new Dictionary<string, string?>();
         }
 
         var data = new Dictionary<string, string?>();
-        var prefixStack = new Stack<string?>();
+        var prefixStack = new Stack<string>();
 
         if (!string.IsNullOrWhiteSpace(_source.RootSection))
         {
@@ -60,10 +60,9 @@ public class WinRegistryConfigurationProvider : ConfigurationProvider
         _source.DataAdapter?.Invoke(data);
 
         Data = data;
-
     }
 
-    static void ReadSection(RegistryKey? section, Dictionary<string, string?> data, Stack<string?> prefixStack)
+    static void ReadSection(RegistryKey? section, IDictionary<string, string?> data, Stack<string> prefixStack)
     {
         foreach (var subKeyName in section?.GetSubKeyNames()!)
         {
@@ -81,7 +80,9 @@ public class WinRegistryConfigurationProvider : ConfigurationProvider
         {
             prefixStack.Push(valueName);
 
-            data[ConfigurationPath.Combine(prefixStack.Reverse())] = section.GetValue(valueName)?.ToString();
+            var keyPath = ConfigurationPath.Combine(prefixStack.Reverse());
+
+            data[keyPath] = section.GetValue(valueName)?.ToString();
 
             prefixStack.Pop();
         }
