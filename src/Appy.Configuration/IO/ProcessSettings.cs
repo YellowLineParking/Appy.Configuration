@@ -11,7 +11,7 @@ public sealed class ProcessSettings
 
     public string WorkingDirectory { get; set; }
 
-    public IDictionary<string, string> EnvironmentVariables { get; set; }
+    public IDictionary<string, string>? EnvironmentVariables { get; set; }
 
     public bool RedirectStandardInput { get; set; } = true;
 
@@ -19,6 +19,5 @@ public sealed class ProcessSettings
 
     public bool UseShellExecute { get; set; }
 
-    public Func<TextReader, Task> StandardErrorReader { get; set; }
-
+    public Func<TextReader, Task>? StandardErrorReader { get; set; }
 }
