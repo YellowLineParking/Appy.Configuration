@@ -14,8 +14,6 @@ public class DefaultProcessRunner : IProcessRunner
         if (settings == null) throw new ArgumentNullException(nameof(settings));
         if (settings.Arguments == null) throw new ArgumentNullException(nameof(settings.Arguments));
 
-        var tasks = new List<Task>();
-
         var command = Command.Run(toolPath, settings.Arguments, options =>
         {
             if (settings.EnvironmentVariables?.Count > 0)
@@ -33,14 +31,12 @@ public class DefaultProcessRunner : IProcessRunner
 
         if (settings.StandardErrorReader != null)
         {
-            tasks.Add(settings.StandardErrorReader.Invoke(command.StandardError));
+            await settings.StandardErrorReader(command.StandardError);
         }
 
-        tasks.Add(command.Task);
+        await command.Task;
 
-        await Task.WhenAll(tasks.ToArray());
-
-        var commandResult = await (Task<CommandResult>)tasks.Last();
+        var commandResult = command.Task.Result;
 
         return ProcessResult.Create(
             standardOutput: commandResult.StandardOutput,

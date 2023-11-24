@@ -6,37 +6,46 @@ namespace Appy.Configuration.IO;
 
 public static class TextReaderExtensions
 {
-    public static async Task<StreamResult?> ReadLineAsync(this TextReader reader, StringBuilder builder)
+    /// <summary>
+    /// Write a line to a <see cref="TextReader"/> and return a <see cref="bool"/> indicating if there is more data to read.
+    /// </summary>
+    public static async Task<bool?> WriteLineAsyncTo(this TextReader reader, StringBuilder builder, char stopChar, int bufferSize = 1024)
     {
-        var written = false;
-        var chars = new char[1];
+        var buffer = new char[bufferSize];
+        var anyDataRead = false;
+
         while (true)
         {
-            var num = await reader.ReadAsync(chars, 0, chars.Length);
-            if (num <= 0)
+            var numCharsRead = await reader.ReadAsync(buffer, 0, buffer.Length);
+            if (numCharsRead <= 0)
             {
-                return written ? new StreamResult(builder.ToString(), hasMore: reader.Peek() != -1) : null;
+                // End of the stream is reached.
+                return anyDataRead ? false : null;
             }
 
-            if (chars[0] == '\r' || chars[0] == '\n')
+            for (var i = 0; i < numCharsRead; i++)
             {
-                builder.Append(chars[0]);
-                if (chars[0] == '\r' && reader.Peek() == (int)'\n')
+                var c = buffer[i];
+                if (c is '\r' or '\n')
                 {
-                    builder.Append((char)reader.Read());
+                    // Check if the next character is '\n' in case of '\r\n'
+                    if (c == '\r' && i + 1 < numCharsRead && buffer[i + 1] == '\n')
+                    {
+                        i++; // Skip the '\n'
+                    }
+
+                    return reader.Peek() != -1;
                 }
 
-                return new StreamResult(builder.ToString(), hasMore: reader.Peek() != -1);
+                if (c == stopChar)
+                {
+                    return false;
+                }
+
+                builder.Append(c);
             }
 
-            written = true;
-            builder.Append(chars[0]);
-
-            // to anticipate last non-ending line
-            if (reader.Peek() == -1)
-            {
-                return written ? new StreamResult(builder.ToString(), hasMore: reader.Peek() != -1) : null;
-            }
+            anyDataRead = true;
         }
     }
 }

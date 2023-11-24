@@ -69,27 +69,35 @@ public class OnePasswordLocalTool : IOnePasswordTool
 
     static Task<ProcessResult> Signin(IProcessRunner processRunner, ILogger logger, SignInOnePasswordCommand command)
     {
-        static async Task LogLines(ILogger logger, TextReader sr)
-        {
-            while (true)
-            {
-                var line = await sr.ReadLineAsync(new StringBuilder());
-                if (line == null) return;
-                logger.LogInformation(line.Result);
-                if (!line.HasMore) return;
-            }
-        }
-
         var processSettings = new ProcessSettings
         {
             Arguments = CreateArgumentsFrom(command),
             EnvironmentVariables = new Dictionary<string, string>(),
             RedirectStandardInput = false,
             CreateNoWindow = false,
-            StandardErrorReader = sr => LogLines(logger, sr)
+            StandardErrorReader = sr => LogLines(logger, textReader: sr, stopChar: ':')
         };
 
         return processRunner.Run(ToolPath, processSettings);
+
+        static async Task LogLines(ILogger logger, TextReader textReader, char stopChar)
+        {
+            var stringBuilder = new StringBuilder();
+
+            while (true)
+            {
+                var hasMore = await textReader.WriteLineAsyncTo(stringBuilder, stopChar);
+                if (hasMore == null)
+                    return;
+
+                logger.LogInformation(stringBuilder.ToString());
+
+                stringBuilder.Clear();
+
+                if (!hasMore.Value)
+                    return;
+            }
+        }
     }
 
     static ProcessArgumentBuilder CreateArgumentsFrom(SignInOnePasswordCommand command)
