@@ -1,13 +1,16 @@
 using Appy.Configuration.OnePassword;
-using Appy.Sample.OnePassword.Api;
+using Appy.Sample.OnePassword.Api.Composition;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Register configuration providers
+
 builder.Configuration
-    // Options to load your project settings
     // 1 - Load without any extension
     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
@@ -42,12 +45,35 @@ builder.Configuration
     // 2 - Using a custom extension with pre-configured settings for your organization that follows the Appy conventions
     // .AddYourOrgAppConfiguration(appName: "Appy.Sample.1Password.Api")
 
-var startup = new Startup(builder.Configuration);
+// Load app settings
 
-startup.ConfigureServices(builder.Services);
+var databaseSettings = new DatabaseSettings();
+
+builder.Configuration.GetSection("Database").Bind(databaseSettings);
+
+// Register dependencies
+
+builder.Services.AddControllers();
+builder.Services.AddLogging(loggingBuilder => loggingBuilder
+    .AddConsole()
+    .AddDebug());
 
 var app = builder.Build();
 
-startup.Configure(app, app.Environment);
+// Configure the app
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+
+app
+    .UseRouting()
+    .UseHttpsRedirection()
+    .UseAuthorization()
+    .UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllers();
+    });
 
 await app.RunAsync();
