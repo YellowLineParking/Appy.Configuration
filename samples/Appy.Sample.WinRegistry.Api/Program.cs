@@ -1,10 +1,13 @@
 using Appy.Configuration.WinRegistry;
-using Appy.Sample.WinRegistry.Api;
+using Appy.Sample.WinRegistry.Api.Composition;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Register your configuration providers
 
 builder.Configuration.Sources.Clear();
 
@@ -20,15 +23,36 @@ builder.Configuration
             .AddRegistrySection(() => Microsoft.Win32.Registry.CurrentUser, "Software\\YOUR_ORG\\Settings");
     }
 
-// 2 - Using a custom extension with pre-configured settings for your organization
+    // 2 - Using a custom extension with pre-configured settings for your organization
     // .AddYourOrgAppConfiguration()
 
-var startup = new Startup(builder.Configuration);
 
-startup.ConfigureServices(builder.Services);
+// Load app settings
+
+var databaseSettings = new DatabaseSettings();
+
+builder.Configuration.GetSection("Database").Bind(databaseSettings);
+
+// Register dependencies
+
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
-startup.Configure(app, app.Environment);
+// Configure the app
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+
+app
+    .UseRouting()
+    .UseHttpsRedirection()
+    .UseAuthorization()
+    .UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllers();
+    });
 
 await app.RunAsync();
