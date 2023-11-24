@@ -73,60 +73,39 @@ With the following values:
 Database:ConnectionString: "Data Source=(LocalDb)\\mssqllocaldb;Initial Catalog=local-org-database;Integrated Security=True"
 ```
 
-Then, the only thing we need to do is register an action to load the configuration values on our Program.cs.
+Then, the only thing we need to do is register an action to load the configuration values on our Program.cs. This way we will have our configuration values ready to use like with any appsettings.json:
+
 
 ```csharp
-public class Program
+
+// Register configuration providers
+
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
+
+if (hostingContext.HostingEnvironment.IsDevelopment())
 {
-    public static void Main(string[] args) =>
-        CreateWebHostBuilder(args).Build().Run();
-
-    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration((hostingContext, builder) =>
-            {
-                builder
-                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                    .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
-                    .AddEnvironmentVariables();
-
-                if (hostingContext.HostingEnvironment.IsDevelopment())
-                {
-                    // Load 1Password settings following the Appy conventions with Appy 1Password Tool.
-                    builder.Add1Password("Appy.Sample.1Password.Api");
-                }
-            }
-            .UseStartup<Startup>();
+    // Register 1Password configuration provider following the Appy conventions with Appy 1Password Tool.
+    builder.Add1Password("Appy.Sample.1Password.Api");
 }
-```
 
-And this way we will have our configuration values ready to use like with any appsettings.json:
+// Load App settings
 
-```csharp
-public class Startup
-{
-    readonly IWebHostEnvironment _host;
-    readonly IConfiguration _config;
+var databaseSettings = new DatabaseSettings();
 
-    public Startup(IConfiguration config, IWebHostEnvironment host)
-    {
-        _host = host;
-        _config = config;
-    }
+var databaseSettings = _config.GetSection("Database").Bind(databaseSettings);
 
-    public void ConfigureServices(IServiceCollection services)
-    {
-        var databaseSettings = new DatabaseSettings();
+... 
 
-        var databaseSettings = _config.GetSection("Database").Bind(databaseSettings);
-        ....
-    }
-}
+// Run App
+await app.RunAsync();
 
 public class DatabaseSettings
 {
     public string ConnectionString { get; set; }
 }
+
 ```
 
 Then would come the part where we communicate with 1Password and get these settings. We have created a command line tool that facilitates the process in a single command and allows you to create a session with some pre-configured settings. More on that below [Appy 1Password Tool](#appy-1password-tool).
@@ -384,49 +363,29 @@ With the following values:
 Database:ConnectionString: "Data Source=(LocalDb)\\mssqllocaldb;Initial Catalog=local-org-database;Integrated Security=True"
 ```
 
-Then, the only thing we need to do is register an action to load the configuration values on our Program.cs file.
+Then, the only thing we need to do is register an action to load the configuration values on our Program.cs file. This way we will have our configuration values ready to use like with any appsettings.json:
 
 ```csharp
-public class Program
+var builder = WebApplication.CreateBuilder(args);
+
+// Register configuration providers
+
+builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+
+if (builder.Environment.IsDevelopment())
 {
-    public static void Main(string[] args) =>
-        CreateWebHostBuilder(args).Build().Run();
-
-    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration((hostingContext, builder) =>
-            {
-                if (hostingContext.HostingEnvironment.IsDevelopment())
-                {
-                    builder.AddRegistrySection(() => Microsoft.Win32.Registry.CurrentUser, "Software\\YOUR_ORG\\Settings");
-                }
-            }
-            .UseStartup<Startup>();
+    builder.Configuration.AddRegistrySection(() => Microsoft.Win32.Registry.CurrentUser, "Software\\YOUR_ORG\\Settings");
 }
-```
 
-And this way we will have our configuration values ready to use like with any appsettings.json:
+// Load App settings
+var databaseSettings = new DatabaseSettings();
 
-```csharp
-public class Startup
-{
-    readonly IWebHostEnvironment _host;
-    readonly IConfiguration _config;
+var databaseSettings = builder.Configuration.GetSection("Database").Bind(databaseSettings);
 
-    public Startup(IConfiguration config, IWebHostEnvironment host)
-    {
-        _host = host;
-        _config = config;
-    }
+...
 
-    public void ConfigureServices(IServiceCollection services)
-    {
-        var databaseSettings = new DatabaseSettings();
-
-        var databaseSettings = _config.GetSection("Database").Bind(databaseSettings);
-        ....
-    }
-}
+// Run App
+await app.RunAsync();
 
 public class DatabaseSettings
 {
@@ -453,16 +412,15 @@ Apart of all these, we could then simply create an extension to load all our con
 with the windows registry configuration in Development and the rest of the appSettings configurations.
 
 ```csharp
-public class Program
-{
-    public static void Main(string[] args) =>
-        CreateWebHostBuilder(args).Build().Run();
+var builder = WebApplication.CreateBuilder(args);
 
-    public static IHostBuilder CreateWebHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .AddYourOrgAppConfiguration()
-            .UseStartup<Startup>();
-}
+// Register configuration providers
+builder.Configuration.AddYourOrgAppConfiguration()
+
+...
+
+// Run App
+await app.RunAsync();
 ```
 
 Then, you can create some configuration extensions for your organization and override the config values in order. All these if necessary,
@@ -498,8 +456,7 @@ public static class YourOrgConfigurationExtensions
 
         if (env.IsDevelopment())
         {
-            builder
-                .AddYourOrgRegistrySection();
+            builder.AddYourOrgRegistrySection();
         }
 
         return builder;
