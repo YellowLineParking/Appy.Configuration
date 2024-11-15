@@ -1,9 +1,9 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0.0-bookworm-slim AS base
+FROM mcr.microsoft.com/dotnet/aspnet:9.0.0-bookworm-slim AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0.100-1-bookworm-slim AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0.100-bookworm-slim AS build
 
 ARG configuration=Release
 
