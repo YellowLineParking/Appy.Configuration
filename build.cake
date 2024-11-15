@@ -1,8 +1,8 @@
-#addin nuget:?package=YamlDotNet&version=13.7.1
+#addin nuget:?package=YamlDotNet&version=16.2.0
 #addin nuget:?package=System.Xml.XDocument&version=4.3.0
-#addin nuget:?package=Cake.MinVer&version=3.0.0
+#addin nuget:?package=Cake.MinVer&version=4.0.0
 #addin nuget:?package=Cake.Yaml&version=6.0.0
-#addin nuget:?package=Cake.Docker&version=1.2.3
+#addin nuget:?package=Cake.Docker&version=1.3.0
 
 #load "./functions.cake"
 

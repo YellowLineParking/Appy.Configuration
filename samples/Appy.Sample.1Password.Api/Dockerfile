@@ -1,9 +1,9 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0.0-bookworm-slim AS base
+FROM mcr.microsoft.com/dotnet/aspnet:9.0.0-bookworm-slim AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0.100-1-bookworm-slim AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0.100-bookworm-slim AS build
 WORKDIR /
 COPY ["samples/Appy.Sample.1Password.Api/Appy.Sample.1Password.Api.csproj", "samples/Appy.Sample.1Password.Api/"]
 COPY ["src/Appy.Configuration.1Password/Appy.Configuration.1Password.csproj", "src/Appy.Configuration.1Password/"]

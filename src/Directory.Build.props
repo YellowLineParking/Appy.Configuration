@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup Label="Settings">
     <Deterministic>true</Deterministic>
-    <LangVersion>12</LangVersion>
+    <LangVersion>Latest</LangVersion>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>embedded</DebugType>
     <MinVerSkip Condition="'$(Configuration)' == 'Debug'">true</MinVerSkip>
@@ -25,7 +25,7 @@
     <PackageProjectUrl>https://github.com/YellowLineParking/Appy.Configuration</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReleaseNotes>https://github.com/YellowLineParking/Appy.Configuration/releases</PackageReleaseNotes>
-    <PackageTags>NET8;NET6;NetStandard;configuration;providers;cli;tools</PackageTags>
+    <PackageTags>NET9;NET8;configuration;providers;cli;tools</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup>
