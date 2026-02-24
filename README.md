@@ -6,16 +6,15 @@
 
 Configuration providers for Dotnet.
 
-The latest supported version of 1Password CLI is 2.23.0. In case you want to use 1Password CLI 1, install version 0.11.0 for any of the Appy packages.
+The latest supported version of 1Password CLI is 2.32.1. In case you want to use 1Password CLI 1, install version 0.11.0 for any of the Appy packages.
 
 ## Configuration Providers
 
 | Package | Latest Stable |
 | --- | --- |
-| [Appy.Configuration.1Password](https://www.nuget.org/packages/Appy.Configuration.1Password) | [![Nuget Package](https://img.shields.io/badge/nuget-1.2.0-blue.svg)](https://www.nuget.org/packages/Appy.Configuration.1Password) |
-| [appy-op](https://www.nuget.org/packages/appy-op) | [![Nuget Package](https://img.shields.io/badge/nuget-1.2.0-blue.svg)](https://www.nuget.org/packages/appy-op) 
-| [appy-op (Docker Image)](https://hub.docker.com/r/appyway/appy-op/tags?page=1&ordering=last_updated) | [![Docker Image](https://img.shields.io/badge/docker-1.2.0-blue.svg)](https://hub.docker.com/r/appyway/appy-op/tags?page=1&ordering=last_updated) |
-| [Appy.Configuration.WinRegistry](https://www.nuget.org/packages/Appy.Configuration.WinRegistry) | [![Nuget Package](https://img.shields.io/badge/nuget-1.2.0-blue.svg)](https://www.nuget.org/packages/Appy.Configuration.WinRegistry) |
+| [Appy.Configuration.1Password](https://www.nuget.org/packages/Appy.Configuration.1Password) | [![Nuget Package](https://img.shields.io/badge/nuget-1.3.1-blue.svg)](https://www.nuget.org/packages/Appy.Configuration.1Password) |
+| [appy-op](https://www.nuget.org/packages/appy-op) | [![Nuget Package](https://img.shields.io/badge/nuget-1.3.1-blue.svg)](https://www.nuget.org/packages/appy-op) 
+| [appy-op (Docker Image)](https://hub.docker.com/r/appyway/appy-op/tags?page=1&ordering=last_updated) | [![Docker Image](https://img.shields.io/badge/docker-1.3.1-blue.svg)](https://hub.docker.com/r/appyway/appy-op/tags?page=1&ordering=last_updated)
 
 ## Table of Contents
 
@@ -29,9 +28,6 @@ The latest supported version of 1Password CLI is 2.23.0. In case you want to use
     * [Auto-renew session activity](#auto-renew-session-activity)
     * [Nano Api and Docker](#nano-api-and-docker)
     * [Tool as Docker Image](#tool-as-docker-image)
-- [Windows Registry Configuration Provider](#windows-registry-configuration-provider)
-    * [Installing](#installing-2)
-    * [Usage](#usage-1)
 
 ## 1Password Configuration Provider
 
@@ -52,7 +48,7 @@ PM> Install-Package Appy.Configuration.1Password
 When you install the package, it should be added to your _csproj_ file. Alternatively, you can add it directly by adding:
 
 ```xml
-<PackageReference Include="Appy.Configuration.1Password" Version="1.2.0" />
+<PackageReference Include="Appy.Configuration.1Password" Version="1.3.1" />
 ```
 
 Let's imagine we have a configuration file like the following appsettings.json file:
@@ -321,153 +317,5 @@ Or you could create your own script and add it to the bin folder to simplify the
 To communicate from your project with the tool, you could simply call the api as explained in the previous
 section, or create a shared network between your projects and the tool.
 
-## Windows Registry Configuration Provider
-
-The Windows registry has been with us for a long time and has served us well. Especially when we work locally or try to debug a project.
-
-With this extension you can easily configure the loading of values from a section of your windows registry to your NETCore project configuration builder.
-
-### Installing
-
-Install using the [Appy.Configuration.WinRegistry NuGet package](https://www.nuget.org/packages/Appy.Configuration.WinRegistry):
-
-```
-PM> Install-Package Appy.Configuration.WinRegistry
-```
-
-### Usage
-
-When you install the package, it should be added to your _csproj_ file. Alternatively, you can add it directly by adding:
-
-```xml
-<PackageReference Include="Appy.Configuration.WinRegistry" Version="1.2.0" />
-```
-
-Now let's imagine we have a configuration file like the following appSettings.json:
-
-```json
-"Database": {
-    "ConnectionString": ""
-}
-```
-
-And a user windows registry section like:
-
-```csharp
-HKEY_CURRENT_USER\SOFTWARE\YOUR_ORG\Settings
-```
-
-With the following values:
-
-```csharp
-Database:ConnectionString: "Data Source=(LocalDb)\\mssqllocaldb;Initial Catalog=local-org-database;Integrated Security=True"
-```
-
-Then, the only thing we need to do is register an action to load the configuration values on our Program.cs file. This way we will have our configuration values ready to use like with any appsettings.json:
-
-```csharp
-var builder = WebApplication.CreateBuilder(args);
-
-// Register configuration providers
-
-builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-
-if (builder.Environment.IsDevelopment())
-{
-    builder.Configuration.AddRegistrySection(() => Microsoft.Win32.Registry.CurrentUser, "Software\\YOUR_ORG\\Settings");
-}
-
-// Load App settings
-var databaseSettings = new DatabaseSettings();
-
-var databaseSettings = builder.Configuration.GetSection("Database").Bind(databaseSettings);
-
-...
-
-// Run App
-await app.RunAsync();
-
-public class DatabaseSettings
-{
-    public string ConnectionString { get; set; }
-}
-```
-
-To switch between environments, we would have a registry key with the settings for each one, like:
-
-```
-QA   -> "Software\\YOUR_ORG\\QA_Settings\\Database:ConnectionString"
-LIVE -> "Software\\YOUR_ORG\\LIVE_Settings\\Database:ConnectionString"
-```
-
-Then we would only have to rename the registry environment folder key that we want to 'Settings',
-every time we need it and return the previous one to its original name.
-
-```
-QA   -> "Software\\YOUR_ORG\\QA_Settings" -> rename -> "Software\\YOUR_ORG\\Settings"      (We want to work with QA)
-LIVE -> "Software\\YOUR_ORG\\Settings"    -> rename -> "Software\\YOUR_ORG\\LIVE_Settings" (LIVE back to his normal name)
-```
-
-Apart of all these, we could then simply create an extension to load all our configurations in just one line,
-with the windows registry configuration in Development and the rest of the appSettings configurations.
-
-```csharp
-var builder = WebApplication.CreateBuilder(args);
-
-// Register configuration providers
-builder.Configuration.AddYourOrgAppConfiguration()
-
-...
-
-// Run App
-await app.RunAsync();
-```
-
-Then, you can create some configuration extensions for your organization and override the config values in order. All these if necessary,
-can be preconfigured in a nuget package for your organization, which each developer can use later in their projects.
-
-```csharp
-public static class YourOrgConfigurationExtensions
-{
-    public static IConfigurationBuilder AddYourOrgRegistrySection(
-        this IConfigurationBuilder builder,
-        Action<WinRegistryConfigurationSource> configureSource = null)
-    {
-        return builder.AddRegistrySection(() =>
-                Microsoft.Win32.Registry.CurrentUser, "Software\\YOUR_ORG\\QA_Settings");
-    }
-
-    public static IHostBuilder AddYourOrgAppConfiguration(this IHostBuilder hostBuilder)
-    {
-        hostBuilder.ConfigureAppConfiguration((hostingContext, config) =>
-        {
-            config.AddYourOrgConfigurationBuilders(hostingContext.HostingEnvironment);
-        });
-
-        return hostBuilder;
-    }
-
-    public static IConfigurationBuilder AddYourOrgConfigurationBuilders(this IConfigurationBuilder builder, IHostEnvironment env)
-    {
-        builder
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-            .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
-            .AddEnvironmentVariables();
-
-        if (env.IsDevelopment())
-        {
-            builder.AddYourOrgRegistrySection();
-        }
-
-        return builder;
-    }
-}
-```
-
-You can find more examples on the samples folder.
-
 ## Contribute
 It would be awesome if you would like to contribute code or help with bugs. Just follow the guidelines [CONTRIBUTING](https://github.com/YellowLineParking/Appy.Configuration/blob/master/CONTRIBUTING.md).
-
-## Additional Resources
-* [WinRegistry Configuration based on GeorgeTsaplin project](https://github.com/GeorgeTsaplin/Configuration.WinRegistry)
