@@ -2,7 +2,7 @@
 #addin nuget:?package=System.Xml.XDocument&version=4.3.0
 #addin nuget:?package=Cake.MinVer&version=4.0.0
 #addin nuget:?package=Cake.Yaml&version=6.0.0
-#addin nuget:?package=Cake.Docker&version=1.3.0
+#addin nuget:?package=Cake.Docker&version=1.5.0-beta.1
 
 #load "./functions.cake"
 

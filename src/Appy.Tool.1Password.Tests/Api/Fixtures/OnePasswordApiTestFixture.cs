@@ -14,14 +14,24 @@ public class OnePasswordApiTestFixture : WebApplicationFactory<OnePasswordApiSta
 {
     ITestOutputHelper _output;
 
-    protected override IWebHostBuilder CreateWebHostBuilder()
+    protected override IHost CreateHost(IHostBuilder builder)
     {
-        return OnePasswordApiRunner
-            .CreateHostBuilder()
-            .UseEnvironment(Environments.Development)
-            .ConfigureLogging(logging => logging
-                .ClearProviders()
-                .AddXUnit(_output));
+        builder.ConfigureWebHost(webBuilder =>
+        {
+            webBuilder
+                .UseTestServer()
+                .UseEnvironment(Environments.Development)
+                .ConfigureLogging(logging => logging
+                    .ClearProviders()
+                    .AddXUnit(_output));
+        });
+
+        return base.CreateHost(builder);
+    }
+
+    protected override IHostBuilder CreateHostBuilder()
+    {
+        return OnePasswordApiRunner.CreateHostBuilder();
     }
 
     public OnePasswordApiTestFixture WithOutput(ITestOutputHelper output)

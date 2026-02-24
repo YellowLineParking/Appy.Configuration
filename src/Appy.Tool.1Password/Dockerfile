@@ -1,9 +1,9 @@
-FROM mcr.microsoft.com/dotnet/aspnet:9.0.0-bookworm-slim AS base
+FROM mcr.microsoft.com/dotnet/aspnet:10.0.3-noble AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0.100-bookworm-slim AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0.103-noble AS build
 
 ARG configuration=Release
 
@@ -28,7 +28,7 @@ RUN dotnet publish "Appy.Tool.1Password.csproj" -c $configuration -o /app/publis
 
 FROM base AS final
 # Install 1Password CLI (op)
-ENV OP_VERSION 2.23.0
+ENV OP_VERSION 2.32.1
 RUN buildDeps="curl gnupg dirmngr unzip" \
     && runDeps="ca-certificates" \
     && apt-get update \
