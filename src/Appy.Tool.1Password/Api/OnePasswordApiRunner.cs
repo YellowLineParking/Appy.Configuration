@@ -8,55 +8,54 @@ namespace Appy.Tool.OnePassword.Api;
 
 public class OnePasswordApiRunner : IOnePasswordApiRunner
 {
-    IWebHost _webHost;
+    IHost? _host;
 
-    public static IWebHostBuilder CreateHostBuilder()
+    public static IHostBuilder CreateHostBuilder()
     {
-        return new WebHostBuilder()
-            .UseKestrel()
-            .ConfigureLogging(logging =>
+        return new HostBuilder()
+            .ConfigureWebHost(webBuilder =>
             {
-                logging.ClearProviders();
-                logging.SetMinimumLevel(LogLevel.Warning);
-                logging.SetMinimumLevel(LogLevel.None);
-            })
-            .SuppressStatusMessages(true)
-            .UseEnvironment(Environments.Production)
-            .UseStartup<OnePasswordApiStartup>();
+                webBuilder
+                    .UseKestrel()
+                    .ConfigureLogging(logging =>
+                    {
+                        logging.ClearProviders();
+                        logging.SetMinimumLevel(LogLevel.None);
+                    })
+                    .SuppressStatusMessages(true)
+                    .UseEnvironment(Environments.Production)
+                    .UseStartup<OnePasswordApiStartup>();
+            });
     }
 
     public void Start(OnePasswordApiSettings settings)
     {
         if (IsRunning())
-        {
             throw new Exception("OnePassword Api already started");
-        }
 
-        _webHost = CreateHostBuilder()
-            .UseUrls($"http://*:{settings.Port}")
+        _host = CreateHostBuilder()
+            .ConfigureWebHost(webBuilder =>
+            {
+                webBuilder.UseUrls($"http://*:{settings.Port}");
+            })
             .Build();
 
         if (!settings.StartWithoutBlocking)
         {
-            _webHost.Run();
+            _host.Run();
             return;
         }
 
-        var _ = _webHost.RunAsync();
+        _ = _host.RunAsync();
     }
 
-    public bool IsRunning()
-    {
-        return _webHost != null;
-    }
+    public bool IsRunning() => _host != null;
 
     public Task Stop()
     {
         if (!IsRunning())
-        {
             return Task.CompletedTask;
-        }
 
-        return _webHost.StopAsync();
+        return _host!.StopAsync();
     }
 }
