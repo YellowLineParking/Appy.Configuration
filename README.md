@@ -185,6 +185,8 @@ Steps:
 
 ### Installing
 
+The CLI requires .NET 10 runtime or later. Ensure you have the ['.NET 10 Runtime'](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) installed.
+
 Install the tool globally.
 
 ```console
