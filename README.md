@@ -185,7 +185,7 @@ Steps:
 
 ### Installing
 
-The CLI requires .NET 10 or later. Ensure you have the [.NET 10](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) installed.
+The CLI requires .NET 10 SDK or later. Ensure you have the [.NET 10](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) installed.
 
 Install the tool globally.
 
@@ -203,7 +203,7 @@ Execute the next command to signin to 1Password and set the vault and environmen
 appy-op --signin <yourorg> <email-address> <secret_key> --vault Development -env QA
 ```
 
-*Note: make sure to use the Secret Key and not the Master Password*
+*Note: make sure to use the Secret Key (from recovery kit) and not the Master Password*
 
 You can get these data from your profile on the 1Password website.
 
@@ -320,4 +320,5 @@ To communicate from your project with the tool, you could simply call the api as
 section, or create a shared network between your projects and the tool.
 
 ## Contribute
+
 It would be awesome if you would like to contribute code or help with bugs. Just follow the guidelines [CONTRIBUTING](https://github.com/YellowLineParking/Appy.Configuration/blob/master/CONTRIBUTING.md).
